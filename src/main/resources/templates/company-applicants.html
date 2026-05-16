@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Applicant Management | PlacementPro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <!-- Nav -->
+    <nav class="bg-emerald-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">🏢</span>
+                <span class="font-bold text-xl">PlacementPro</span>
+                <span class="px-2 py-0.5 text-xs font-bold bg-emerald-800/60 rounded ml-3 uppercase tracking-widest text-emerald-200">Applicants</span>
+            </div>
+            <div class="flex items-center space-x-5">
+                <a th:href="@{/company/dashboard}" class="text-emerald-200 hover:text-white text-sm font-medium">← Back to Dashboard</a>
+                <a th:href="@{/logout}" class="bg-emerald-600 border border-emerald-500 hover:bg-emerald-500 px-3 py-1.5 rounded-lg text-sm font-medium transition">Sign Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-2xl font-bold text-slate-800 mb-6">Applicants for Job #<span th:text="${jobId}">0</span></h1>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">USN</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Student Name</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Applied</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Current Status</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Change Status</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Schedule Interview</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <tr th:each="app : ${applicants}">
+                        <td class="px-5 py-4 text-sm font-mono text-slate-700" th:text="${app.studentUsn}">USN</td>
+                        <td class="px-5 py-4 text-sm font-medium text-slate-800" th:text="${app.companyName}">Name</td>
+                        <td class="px-5 py-4 text-sm text-slate-500" th:text="${app.applyDate}">Date</td>
+                        <td class="px-5 py-4">
+                            <span class="px-2.5 py-1 text-xs font-bold rounded-full"
+                                  th:classappend="${app.status == 'Applied' ? 'bg-blue-100 text-blue-700' : (app.status == 'Shortlisted' ? 'bg-amber-100 text-amber-700' : (app.status == 'Selected' ? 'bg-emerald-100 text-emerald-700' : (app.status == 'Rejected' ? 'bg-red-100 text-red-600' : 'bg-violet-100 text-violet-700')))}"
+                                  th:text="${app.status}">Status</span>
+                        </td>
+                        <td class="px-5 py-4">
+                            <form th:action="@{/company/update-status}" method="post" class="flex items-center space-x-2">
+                                <input type="hidden" name="appId" th:value="${app.appId}">
+                                <input type="hidden" name="jobId" th:value="${jobId}">
+                                <select name="status" class="text-xs border border-slate-200 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-emerald-200 outline-none">
+                                    <option value="Shortlisted">Shortlisted</option>
+                                    <option value="Interview Scheduled">Interview Scheduled</option>
+                                    <option value="Selected">Selected</option>
+                                    <option value="Rejected">Rejected</option>
+                                </select>
+                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition">Update</button>
+                            </form>
+                        </td>
+                        <td class="px-5 py-4">
+                            <button onclick="openModal(this)" th:data-appid="${app.appId}" th:data-jobid="${jobId}" class="text-indigo-600 hover:text-indigo-800 text-xs font-bold">+ Schedule</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${applicants.isEmpty()}" class="text-center py-12 text-slate-400 bg-white rounded-xl mt-4 border">
+            <p>No applicants yet for this job.</p>
+        </div>
+    </main>
+
+    <!-- Interview Schedule Modal -->
+    <div id="interviewModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 flex">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+            <h2 class="text-lg font-bold text-slate-800 mb-5">Schedule Interview</h2>
+            <form th:action="@{/company/schedule-interview}" method="post" class="space-y-4">
+                <input type="hidden" name="appId" id="modalAppId">
+                <input type="hidden" name="jobId" id="modalJobId">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Round Name</label>
+                    <input type="text" name="roundName" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-indigo-100 outline-none" placeholder="e.g. Technical Round">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Date</label>
+                        <input type="date" name="interviewDate" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-indigo-100 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Time</label>
+                        <input type="time" name="interviewTime" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-indigo-100 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Venue / Link</label>
+                    <input type="text" name="venue" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-indigo-100 outline-none" placeholder="e.g. Room 301 or Zoom link">
+                </div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition active:scale-95">Schedule</button>
+                    <button type="button" onclick="closeModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 px-6 rounded-xl transition">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(btn) {
+            document.getElementById('modalAppId').value = btn.dataset.appid;
+            document.getElementById('modalJobId').value = btn.dataset.jobid;
+            document.getElementById('interviewModal').classList.remove('hidden');
+        }
+        function closeModal() {
+            document.getElementById('interviewModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

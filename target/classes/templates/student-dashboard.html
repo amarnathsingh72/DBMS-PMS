@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard | PlacementPro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-btn.active { border-color: #4f46e5; color: #4f46e5; background: #eef2ff; }
+        .status-applied { background: #dbeafe; color: #1d4ed8; }
+        .status-shortlisted { background: #fef3c7; color: #b45309; }
+        .status-interview { background: #ede9fe; color: #7c3aed; }
+        .status-selected { background: #d1fae5; color: #047857; }
+        .status-rejected { background: #fee2e2; color: #b91c1c; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="bg-indigo-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">🎓</span>
+                <span class="font-bold text-xl tracking-tight">PlacementPro</span>
+                <span class="px-2 py-0.5 text-xs font-bold bg-indigo-800/60 rounded ml-3 uppercase tracking-widest text-indigo-200">Student</span>
+            </div>
+            <div class="flex items-center space-x-5">
+                <div class="relative cursor-pointer" onclick="switchTab('notifications')">
+                    <svg class="w-6 h-6 text-indigo-200 hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <span th:if="${unreadCount > 0}" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold" th:text="${unreadCount}">0</span>
+                </div>
+                <span class="text-indigo-100 text-sm font-medium" th:text="${student.name}">Name</span>
+                <span class="text-yellow-300 text-sm font-bold" th:text="'CGPA ' + ${student.cgpa}">CGPA</span>
+                <a th:href="@{/logout}" class="bg-indigo-600 border border-indigo-500 hover:bg-indigo-500 px-3 py-1.5 rounded-lg text-sm font-medium transition">Sign Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <!-- Welcome -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-slate-800">Welcome, <span th:text="${student.name.split(' ')[0]}">Name</span>! 👋</h1>
+            <p class="text-slate-500 mt-1">Your placement journey at a glance.</p>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Applications</p>
+                <p class="text-3xl font-black text-indigo-600" th:text="${student.applicationsSubmitted}">0</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Shortlisted</p>
+                <p class="text-3xl font-black text-amber-500" th:text="${student.shortlistedCount}">0</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Interviews</p>
+                <p class="text-3xl font-black text-emerald-500" th:text="${student.interviewsScheduled}">0</p>
+            </div>
+            <div class="p-5 rounded-xl shadow-sm border hover:shadow-md transition-shadow"
+                 th:classappend="${student.placed ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-100'}">
+                <p class="text-xs font-bold uppercase tracking-wider mb-1" th:classappend="${student.placed ? 'text-emerald-600' : 'text-slate-400'}">Status</p>
+                <p th:if="${student.placed}" class="text-2xl font-black text-emerald-600">PLACED 🎉</p>
+                <p th:unless="${student.placed}" class="text-lg font-bold text-slate-400">Seeking</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex space-x-1 border-b border-slate-200 mb-6">
+            <button onclick="switchTab('jobs')" id="tab-jobs" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-indigo-600 transition active">Browse Jobs</button>
+            <button onclick="switchTab('applications')" id="tab-applications" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-indigo-600 transition">My Applications</button>
+            <button onclick="switchTab('notifications')" id="tab-notifications" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-indigo-600 transition">
+                Notifications <span th:if="${unreadCount > 0}" class="ml-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full" th:text="${unreadCount}">0</span>
+            </button>
+        </div>
+
+        <!-- TAB: Browse Jobs -->
+        <div id="panel-jobs" class="tab-panel">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Company</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Role</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Package</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Deadline</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Eligibility</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr th:each="job : ${jobs}" th:classappend="${!job.eligible and !job.hasApplied} ? 'opacity-60' : ''">
+                            <td class="px-5 py-4 text-sm font-medium text-slate-800" th:text="${job.companyName}">Company</td>
+                            <td class="px-5 py-4 text-sm text-slate-600" th:text="${job.roleName}">Role</td>
+                            <td class="px-5 py-4 text-sm font-semibold text-emerald-600" th:text="${job.packageLpa} + ' LPA'">LPA</td>
+                            <td class="px-5 py-4 text-sm text-slate-500" th:text="${job.deadline}">Date</td>
+                            <td class="px-5 py-4">
+                                <span th:if="${job.eligible}" class="px-2.5 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-700">✓ Eligible</span>
+                                <span th:if="${job.hasApplied}" class="px-2.5 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-700">✓ Applied</span>
+                                <span th:if="${!job.eligible and !job.hasApplied}" class="px-2.5 py-1 text-xs font-bold rounded-full bg-red-50 text-red-500" th:text="${job.eligibilityMessage}">Reason</span>
+                            </td>
+                            <td class="px-5 py-4">
+                                <form th:if="${job.eligible}" th:action="@{/student/apply}" method="post" class="inline">
+                                    <input type="hidden" name="jobId" th:value="${job.jobId}">
+                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition active:scale-95 shadow-sm">Apply</button>
+                                </form>
+                                <span th:unless="${job.eligible}" class="text-slate-300 text-xs">—</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: My Applications -->
+        <div id="panel-applications" class="tab-panel hidden">
+            <div class="space-y-4">
+                <div th:each="app : ${applications}" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-slate-800" th:text="${app.roleName}">Role</h3>
+                            <p class="text-sm text-slate-500" th:text="${app.companyName} + ' • ' + ${app.packageLpa} + ' LPA'">Company</p>
+                            <p class="text-xs text-slate-400 mt-1">Applied: <span th:text="${app.applyDate}">Date</span></p>
+                        </div>
+                        <span class="px-3 py-1 text-xs font-bold rounded-full"
+                              th:classappend="${app.status == 'Applied' ? 'status-applied' : (app.status == 'Shortlisted' ? 'status-shortlisted' : (app.status == 'Interview Scheduled' ? 'status-interview' : (app.status == 'Selected' ? 'status-selected' : 'status-rejected')))}"
+                              th:text="${app.status}">Status</span>
+                    </div>
+                    <!-- Interview Rounds -->
+                    <div th:if="${app.interviews != null and !app.interviews.isEmpty()}" class="mt-4 border-t border-slate-100 pt-3">
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-2">Interview Rounds</p>
+                        <div class="space-y-2">
+                            <div th:each="iv : ${app.interviews}" class="flex items-center justify-between bg-slate-50 rounded-lg px-4 py-2">
+                                <span class="text-sm font-medium text-slate-700" th:text="${iv.roundName}">Round</span>
+                                <span class="text-sm text-slate-500" th:text="${iv.interviewDate} + ' ' + ${iv.interviewTime}">Date</span>
+                                <span class="text-xs font-bold rounded-full px-2 py-0.5"
+                                      th:classappend="${iv.result == 'Pass' ? 'bg-emerald-100 text-emerald-700' : (iv.result == 'Fail' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-700')}"
+                                      th:text="${iv.result}">Result</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${applications.isEmpty()}" class="text-center py-12 text-slate-400">
+                    <p class="text-lg">No applications yet. Browse jobs and apply!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Notifications -->
+        <div id="panel-notifications" class="tab-panel hidden">
+            <div class="space-y-3">
+                <div th:each="notif : ${notifications}" class="bg-white rounded-xl shadow-sm border p-4 flex items-start space-x-3"
+                     th:classappend="${!notif.read ? 'border-indigo-200 bg-indigo-50/30' : 'border-slate-200'}">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm"
+                         th:classappend="${!notif.read ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400'}">🔔</div>
+                    <div class="flex-1">
+                        <p class="text-sm text-slate-700" th:text="${notif.message}">Message</p>
+                        <p class="text-xs text-slate-400 mt-1" th:text="${notif.createdAt}">Time</p>
+                    </div>
+                    <form th:if="${!notif.read}" th:action="@{/student/notifications/read}" method="post">
+                        <input type="hidden" name="notifId" th:value="${notif.notifId}">
+                        <button class="text-xs text-indigo-500 hover:text-indigo-700 font-medium">Mark read</button>
+                    </form>
+                </div>
+                <div th:if="${notifications.isEmpty()}" class="text-center py-12 text-slate-400">
+                    <p class="text-lg">No notifications yet.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('panel-' + tab).classList.remove('hidden');
+            document.getElementById('tab-' + tab).classList.add('active');
+        }
+        // Check URL for tab param
+        const urlParams = new URLSearchParams(window.location.search);
+        const tab = urlParams.get('tab');
+        if (tab) switchTab(tab);
+    </script>
+</body>
+</html>

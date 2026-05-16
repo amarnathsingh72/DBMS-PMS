@@ -268,7 +268,8 @@ INSERT INTO STUDENT (Student_USN, Name, Email, Dept, Semester, CGPA, Password_Ha
 ('4SF24CI016', 'Ritu K', 'ritu@example.com', 'ECE', 4, 7.6, 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f'),
 ('4SF24CI017', 'Deepak H', 'deepak@example.com', 'MECH', 4, 6.2, 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f'),
 ('4SF24CI018', 'Ananya V', 'ananya@example.com', 'CSE', 4, 9.2, 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f'),
-('4SF24CI019', 'Rakesh M', 'rakesh@example.com', 'CIVIL', 4, 7.4, 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f');
+('4SF24CI019', 'Rakesh M', 'rakesh@example.com', 'CIVIL', 4, 7.4, 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f'),
+('4SF24CI020', 'Shubham S', 'shubham@example.com', 'CSE', 4, 8.8, 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f');
 
 
 -- Insert 8 Companies

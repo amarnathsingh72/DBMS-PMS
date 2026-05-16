@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Placement Reports | PlacementPro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <!-- Nav -->
+    <nav class="bg-teal-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">📊</span>
+                <span class="font-bold text-xl">PlacementPro</span>
+                <span class="px-2 py-0.5 text-xs font-bold bg-teal-800/60 rounded ml-3 uppercase tracking-widest text-teal-200">Reports</span>
+            </div>
+            <div class="flex items-center space-x-5">
+                <a th:href="@{/faculty/dashboard}" class="text-teal-200 hover:text-white text-sm font-medium">← Back to Dashboard</a>
+                <a th:href="@{/logout}" class="bg-teal-600 border border-teal-500 hover:bg-teal-500 px-3 py-1.5 rounded-lg text-sm font-medium transition">Sign Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-2xl font-bold text-slate-800 mb-2">Placement Report</h1>
+        <p class="text-slate-500 mb-8">Generated from <code class="bg-slate-100 px-2 py-0.5 rounded text-sm font-mono text-teal-700">sp_generate_placement_report()</code></p>
+
+        <!-- Department-wise Summary -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+            <div class="p-4 bg-teal-50 border-b border-teal-100">
+                <h2 class="font-bold text-teal-800">📋 Department-wise Placement Summary</h2>
+            </div>
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50"><tr>
+                    <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Department</th>
+                    <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Total Students</th>
+                    <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Placed</th>
+                    <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Placement %</th>
+                    <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Avg Package (LPA)</th>
+                </tr></thead>
+                <tbody class="divide-y divide-slate-100">
+                    <tr th:each="d : ${deptReport}">
+                        <td class="px-5 py-4 text-sm font-bold text-slate-800" th:text="${d['Dept']}">Dept</td>
+                        <td class="px-5 py-4 text-sm text-slate-600" th:text="${d['Total_Students']}">0</td>
+                        <td class="px-5 py-4 text-sm font-semibold text-emerald-600" th:text="${d['Placed_Students']}">0</td>
+                        <td class="px-5 py-4">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-24 bg-slate-100 rounded-full h-2">
+                                    <div class="bg-teal-500 h-2 rounded-full" th:style="'width:' + ${d['Placement_Percentage']} + '%'"></div>
+                                </div>
+                                <span class="text-sm font-bold text-teal-700" th:text="${d['Placement_Percentage']} + '%'">0%</span>
+                            </div>
+                        </td>
+                        <td class="px-5 py-4 text-sm font-semibold text-indigo-600" th:text="${d['Avg_Package_LPA'] != null ? d['Avg_Package_LPA'] : '—'}">—</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Top 5 Companies -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-4 bg-amber-50 border-b border-amber-100">
+                <h2 class="font-bold text-amber-800">🏆 Top 5 Companies by Hires</h2>
+            </div>
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50"><tr>
+                    <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Rank</th>
+                    <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Company</th>
+                    <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Hires</th>
+                    <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Avg Package (LPA)</th>
+                </tr></thead>
+                <tbody class="divide-y divide-slate-100">
+                    <tr th:each="c, iter : ${topCompanies}">
+                        <td class="px-5 py-4 text-sm font-bold text-amber-600" th:text="${iter.index + 1}">#</td>
+                        <td class="px-5 py-4 text-sm font-bold text-slate-800" th:text="${c['Company_Name']}">Company</td>
+                        <td class="px-5 py-4 text-sm font-semibold text-emerald-600" th:text="${c['Hires']}">0</td>
+                        <td class="px-5 py-4 text-sm font-semibold text-indigo-600" th:text="${c['Avg_Package']}">0</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div th:if="${topCompanies.isEmpty()}" class="p-8 text-center text-slate-400">
+                <p>No selections recorded yet.</p>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

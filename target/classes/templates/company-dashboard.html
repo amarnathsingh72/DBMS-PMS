@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Company Dashboard | PlacementPro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+    <!-- Nav -->
+    <nav class="bg-emerald-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">🏢</span>
+                <span class="font-bold text-xl">PlacementPro</span>
+                <span class="px-2 py-0.5 text-xs font-bold bg-emerald-800/60 rounded ml-3 uppercase tracking-widest text-emerald-200">Company</span>
+            </div>
+            <div class="flex items-center space-x-5">
+                <span class="text-emerald-100 font-medium" th:text="${companyName}">Company</span>
+                <a th:href="@{/logout}" class="bg-emerald-600 border border-emerald-500 hover:bg-emerald-500 px-3 py-1.5 rounded-lg text-sm font-medium transition">Sign Out</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-2xl font-bold text-slate-800 mb-6">Welcome, <span th:text="${companyName}">Company</span> 👋</h1>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Job Posts</p>
+                <p class="text-3xl font-black text-emerald-600" th:text="${stats['totalJobs']}">0</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Total Applicants</p>
+                <p class="text-3xl font-black text-indigo-600" th:text="${stats['totalApplicants']}">0</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Hired</p>
+                <p class="text-3xl font-black text-amber-500" th:text="${stats['selected']}">0</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Pending Interviews</p>
+                <p class="text-3xl font-black text-violet-500" th:text="${stats['pendingInterviews']}">0</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex space-x-1 border-b border-slate-200 mb-6">
+            <button onclick="switchTab('jobs')" id="tab-jobs" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-emerald-600 text-emerald-600 bg-emerald-50 transition">My Jobs</button>
+            <button onclick="switchTab('postjob')" id="tab-postjob" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-emerald-600 transition">Post New Job</button>
+        </div>
+
+        <!-- TAB: My Jobs -->
+        <div id="panel-jobs" class="tab-panel">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Role</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Package</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Min CGPA</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Depts</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Deadline</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Applicants</th>
+                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr th:each="job : ${jobs}">
+                            <td class="px-5 py-4 text-sm font-medium text-slate-800" th:text="${job.roleName}">Role</td>
+                            <td class="px-5 py-4 text-sm font-semibold text-emerald-600" th:text="${job.packageLpa} + ' LPA'">LPA</td>
+                            <td class="px-5 py-4 text-sm text-slate-500" th:text="${job.minCgpa}">CGPA</td>
+                            <td class="px-5 py-4 text-sm text-slate-500" th:text="${job.allowedDepts}">Depts</td>
+                            <td class="px-5 py-4 text-sm text-slate-500" th:text="${job.deadline}">Date</td>
+                            <td class="px-5 py-4 text-sm font-bold text-indigo-600" th:text="${job.eligibilityMessage}">0</td>
+                            <td class="px-5 py-4">
+                                <a th:href="@{/company/applicants(jobId=${job.jobId})}" class="text-emerald-600 hover:text-emerald-800 text-xs font-bold">View Applicants →</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: Post New Job -->
+        <div id="panel-postjob" class="tab-panel hidden">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 max-w-2xl">
+                <h2 class="text-lg font-bold text-slate-800 mb-6">Post a New Job Opening</h2>
+                <form th:action="@{/company/post-job}" method="post" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Role Name</label>
+                        <input type="text" name="roleName" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 outline-none" placeholder="e.g. SDE-1">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Package (LPA)</label>
+                            <input type="number" step="0.01" name="packageLpa" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 outline-none" placeholder="e.g. 12.0">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Min CGPA</label>
+                            <input type="number" step="0.1" name="minCgpa" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 outline-none" placeholder="e.g. 7.0">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Allowed Departments (comma-separated)</label>
+                        <input type="text" name="allowedDepts" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 outline-none" placeholder="e.g. CSE,ECE,MECH">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Deadline</label>
+                        <input type="date" name="deadline" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 outline-none">
+                    </div>
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-emerald-200 transition active:scale-95">Post Job</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('border-emerald-600','text-emerald-600','bg-emerald-50'); b.classList.add('border-transparent','text-slate-500'); });
+            document.getElementById('panel-' + tab).classList.remove('hidden');
+            const btn = document.getElementById('tab-' + tab);
+            btn.classList.remove('border-transparent','text-slate-500');
+            btn.classList.add('border-emerald-600','text-emerald-600','bg-emerald-50');
+        }
+    </script>
+</body>
+</html>
