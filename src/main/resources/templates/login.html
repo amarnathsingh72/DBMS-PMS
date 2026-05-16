@@ -2,65 +2,94 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlacementPro | Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Outfit', sans-serif; }
         .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .bg-dynamic {
+            background: linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.4)), url('/images/login_bg.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-20px) rotate(5deg); opacity: 0.6; }
+            100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+        }
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            z-index: -1;
+            animation: float 10s ease-in-out infinite;
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center p-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+<body class="bg-dynamic min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+    
+    <!-- Dynamic Orbs -->
+    <div class="floating-orb w-64 h-64 bg-indigo-500/30 top-1/4 -left-32"></div>
+    <div class="floating-orb w-96 h-96 bg-blue-500/20 bottom-1/4 -right-48" style="animation-delay: -5s;"></div>
 
-    <div class="glass-card w-full max-w-md p-8 rounded-2xl shadow-2xl">
+    <div class="glass-card w-full max-w-md p-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] transform transition-all hover:scale-[1.01]">
         <div class="text-center mb-10">
-            <div class="text-5xl mb-4">🎓</div>
-            <h1 class="text-3xl font-bold text-slate-800 tracking-tight">PlacementPro</h1>
-            <p class="text-slate-500 mt-2">Sign in to your dashboard</p>
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-indigo-600 shadow-xl shadow-indigo-200 mb-6 transform -rotate-6">
+                <span class="text-4xl">🎓</span>
+            </div>
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">PlacementPro</h1>
+            <p class="text-slate-600 mt-2 font-medium">Elevating Career Pipelines</p>
         </div>
 
-        <!-- Role Selector (Demonstrating Java-style logic in Frontend) -->
         <form th:action="@{/login}" method="post" class="space-y-6">
             
-            <div class="grid grid-cols-3 gap-2 mb-6">
-                <button type="button" onclick="setRole('STUDENT')" id="btn-STUDENT" class="role-btn py-2 text-sm font-semibold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-600 transition-all">Student</button>
-                <button type="button" onclick="setRole('FACULTY')" id="btn-FACULTY" class="role-btn py-2 text-sm font-semibold rounded-lg border-2 border-transparent text-slate-500 hover:bg-slate-100 transition-all">Faculty</button>
-                <button type="button" onclick="setRole('COMPANY')" id="btn-COMPANY" class="role-btn py-2 text-sm font-semibold rounded-lg border-2 border-transparent text-slate-500 hover:bg-slate-100 transition-all">Company</button>
+            <div class="bg-white/50 p-1 rounded-2xl flex gap-1 mb-8 shadow-inner">
+                <button type="button" onclick="setRole('STUDENT')" id="btn-STUDENT" class="role-btn flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 bg-indigo-600 text-white shadow-lg shadow-indigo-200">Student</button>
+                <button type="button" onclick="setRole('FACULTY')" id="btn-FACULTY" class="role-btn flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 text-slate-600 hover:bg-white/80">Faculty</button>
+                <button type="button" onclick="setRole('COMPANY')" id="btn-COMPANY" class="role-btn flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 text-slate-600 hover:bg-white/80">Company</button>
             </div>
 
             <input type="hidden" name="role" id="roleInput" value="STUDENT">
 
-            <div>
-                <label id="idLabel" class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">USN</label>
-                <input type="text" name="username" required
-                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all placeholder-slate-300"
-                       placeholder="e.g. 4SF24CI001">
+            <div class="space-y-2">
+                <label id="idLabel" class="block text-xs font-bold text-indigo-900/60 uppercase tracking-widest ml-1">USN</label>
+                <div class="relative group">
+                    <input type="text" name="username" required
+                           class="w-full pl-4 pr-4 py-4 rounded-2xl border-0 bg-white/80 focus:bg-white ring-1 ring-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm group-hover:shadow-md"
+                           placeholder="Enter your ID">
+                </div>
             </div>
 
-            <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Password</label>
-                <input type="password" name="password" required
-                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all placeholder-slate-300"
-                       placeholder="••••••••">
+            <div class="space-y-2">
+                <label class="block text-xs font-bold text-indigo-900/60 uppercase tracking-widest ml-1">Password</label>
+                <div class="relative group">
+                    <input type="password" name="password" required
+                           class="w-full pl-4 pr-4 py-4 rounded-2xl border-0 bg-white/80 focus:bg-white ring-1 ring-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm group-hover:shadow-md"
+                           placeholder="••••••••">
+                </div>
             </div>
 
-            <!-- Error message from Java Controller -->
-            <div th:if="${error}" class="p-3 rounded-lg bg-red-50 text-red-600 text-sm border border-red-100 animate-pulse">
-                <span th:text="${error}">Error message here</span>
+            <div th:if="${error}" class="p-4 rounded-2xl bg-red-50/80 backdrop-blur-sm text-red-600 text-sm border border-red-100 flex items-center gap-3 animate-[shake_0.5s_ease-in-out]">
+                <span class="text-lg">⚠️</span>
+                <span th:text="${error}" class="font-semibold">Error message here</span>
             </div>
 
             <button type="submit" 
-                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-95">
-                Sign In
+                    class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-5 rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-2 group">
+                <span>Sign In to Portal</span>
+                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
             </button>
         </form>
 
-        <div class="mt-8 text-center text-xs text-slate-400">
-            &copy; 2026 PlacementPro — College Placement System
+        <div class="mt-10 text-center">
+            <p class="text-xs text-slate-500 font-medium tracking-wide">&copy; 2026 PLACEMENTPRO SYSTEM &bull; V2.0</p>
         </div>
     </div>
 
@@ -69,14 +98,13 @@
             document.getElementById('roleInput').value = role;
             document.getElementById('idLabel').innerText = role === 'STUDENT' ? 'USN' : (role === 'FACULTY' ? 'Faculty ID' : 'Company ID');
             
-            // Update UI buttons
             document.querySelectorAll('.role-btn').forEach(btn => {
-                btn.classList.remove('border-indigo-600', 'bg-indigo-50', 'text-indigo-600');
-                btn.classList.add('border-transparent', 'text-slate-500');
+                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-200');
+                btn.classList.add('text-slate-600', 'hover:bg-white/80');
             });
             const activeBtn = document.getElementById('btn-' + role);
-            activeBtn.classList.remove('border-transparent', 'text-slate-500');
-            activeBtn.classList.add('border-indigo-600', 'bg-indigo-50', 'text-indigo-600');
+            activeBtn.classList.remove('text-slate-600', 'hover:bg-white/80');
+            activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-200');
         }
     </script>
 </body>

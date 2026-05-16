@@ -20,24 +20,24 @@ Use this document to track our progression through the PlacementPro build. Check
 - [x] P2.4 — Dashboard Shell Classes (empty)
 
 ## 🎓 Phase 3: Student Dashboard + Browse Jobs
-- [ ] P3.1 — StudentDAO (profile fetch)
-- [ ] P3.2 — Quick Stat Cards Component
-- [ ] P3.3 — Student Dashboard Layout
-- [ ] P3.4 — JobDAO + Eligibility Checker
-- [ ] P3.5 — Browse Jobs Panel
+- [x] P3.1 — StudentDAO (profile fetch)
+- [x] P3.2 — Quick Stat Cards Component
+- [x] P3.3 — Student Dashboard Layout
+- [x] P3.4 — JobDAO + Eligibility Checker
+- [x] P3.5 — Browse Jobs Panel
 
 ## 🚀 Phase 4: Application Flow + Trigger Test
-- [ ] P4.1 — ApplicationDAO
-- [ ] P4.2 — My Applications Panel (Student)
-- [ ] P4.3 — Company Applicant Panel
-- [ ] P4.4 — Interview Schedule Dialog
-- [ ] P4.5 — Notification Panel
+- [x] P4.1 — ApplicationDAO
+- [x] P4.2 — My Applications Panel (Student)
+- [x] P4.3 — Company Applicant Panel
+- [x] P4.4 — Interview Schedule Dialog
+- [x] P4.5 — Notification Panel
 
 ## 📋 Phase 5: Faculty Admin + Stored Procedure
-- [ ] P5.1 — Faculty Dashboard Layout
-- [ ] P5.2 — Faculty Student Management Panel
-- [ ] P5.3 — Faculty Application Overview
-- [ ] P5.4 — Report Panel + Stored Procedure Call
+- [x] P5.1 — Faculty Dashboard Layout
+- [x] P5.2 — Faculty Student Management Panel
+- [x] P5.3 — Faculty Application Overview
+- [x] P5.4 — Report Panel + Stored Procedure Call
 
 ## ✨ Phase 6: Gemini AI Integration + Polish
 - [ ] P6.1 — Gemini API Client

@@ -27,6 +27,23 @@ public class StudentController {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private com.placementpro.service.GeminiService geminiService;
+
+    @GetMapping("/ai-advice")
+    public String getAiAdvice(HttpSession session, Model model) {
+        String usn = (String) session.getAttribute("userId");
+        StudentDTO student = studentService.getStudentDashboardInfo(usn);
+        
+        String prompt = "Give a 3-sentence career advice for a student named " + student.getName() + 
+                       " from " + student.getDept() + " department with a CGPA of " + student.getCgpa() + 
+                       ". Focus on placement readiness.";
+        
+        String advice = geminiService.getAIAdvice(prompt);
+        model.addAttribute("aiAdvice", advice);
+        return "student-dashboard :: ai-section";
+    }
+
     @GetMapping("/dashboard")
     public String showDashboard(HttpSession session, Model model) {
         String usn = (String) session.getAttribute("userId");

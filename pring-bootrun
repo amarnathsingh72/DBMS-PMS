@@ -1,0 +1,11 @@
+[33mcommit 04e7a06b610a56337f605fef62fe396f90cb4427[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdbms[m[33m, [m[1;31morigin/dbms[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: SINGH <amarnathsingh10122006@gmail.com>
+Date:   Sat May 16 23:23:16 2026 +0530
+
+    Login + Session System {Student,Faculty,Company]
+
+[33mcommit 0a63eae97a333216314cb70e8bd3db2e30332675[m
+Author: SINGH <amarnathsingh10122006@gmail.com>
+Date:   Thu May 14 16:03:57 2026 +0530
+
+    First commit
