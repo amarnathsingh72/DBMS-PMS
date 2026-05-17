@@ -5,17 +5,15 @@
     <title>Student Dashboard | PlacementPro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <script src="/js/main.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .tab-btn.active { border-color: #4f46e5; color: #4f46e5; background: #eef2ff; }
-        .status-applied { background: #dbeafe; color: #1d4ed8; }
-        .status-shortlisted { background: #fef3c7; color: #b45309; }
-        .status-interview { background: #ede9fe; color: #7c3aed; }
-        .status-selected { background: #d1fae5; color: #047857; }
-        .status-rejected { background: #fee2e2; color: #b91c1c; }
+        body { font-family: 'Outfit', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-[#F4F6FA] min-h-screen">
 
     <!-- Navigation -->
     <nav class="bg-indigo-700 text-white shadow-lg">
@@ -70,25 +68,40 @@
             </div>
         </div>
 
-        <!-- Stat Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Applications</p>
-                <p class="text-3xl font-black text-indigo-600" th:text="${student.applicationsSubmitted}">0</p>
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <!-- Left: Stats & Advisor -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover">
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Applications</p>
+                        <p class="text-4xl font-black text-[#1A56DB]" th:text="${student.applicationsSubmitted}">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover">
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Shortlisted</p>
+                        <p class="text-4xl font-black text-[#F59E0B]" th:text="${student.shortlistedCount}">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover">
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Interviews</p>
+                        <p class="text-4xl font-black text-[#8B5CF6]" th:text="${student.interviewsScheduled}">0</p>
+                    </div>
+                    <div class="p-6 rounded-2xl shadow-sm border card-hover"
+                         th:classappend="${student.placed ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-100'}">
+                        <p class="text-xs font-bold uppercase tracking-widest mb-1" th:classappend="${student.placed ? 'text-emerald-600' : 'text-slate-400'}">Status</p>
+                        <p th:if="${student.placed}" class="text-2xl font-black text-emerald-600">PLACED 🎉</p>
+                        <p th:unless="${student.placed}" class="text-xl font-bold text-slate-400">Seeking</p>
+                    </div>
+                </div>
+
+                <!-- AI Advisor (already there, but wrapping it) -->
+                <div th:replace="~{student-dashboard :: ai-section}"></div>
             </div>
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Shortlisted</p>
-                <p class="text-3xl font-black text-amber-500" th:text="${student.shortlistedCount}">0</p>
-            </div>
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Interviews</p>
-                <p class="text-3xl font-black text-emerald-500" th:text="${student.interviewsScheduled}">0</p>
-            </div>
-            <div class="p-5 rounded-xl shadow-sm border hover:shadow-md transition-shadow"
-                 th:classappend="${student.placed ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-100'}">
-                <p class="text-xs font-bold uppercase tracking-wider mb-1" th:classappend="${student.placed ? 'text-emerald-600' : 'text-slate-400'}">Status</p>
-                <p th:if="${student.placed}" class="text-2xl font-black text-emerald-600">PLACED 🎉</p>
-                <p th:unless="${student.placed}" class="text-lg font-bold text-slate-400">Seeking</p>
+
+            <!-- Right: Analytics Chart -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-6">Placement Pipeline</h3>
+                <canvas id="pipelineChart" height="200"></canvas>
             </div>
         </div>
 
@@ -207,6 +220,32 @@
         const urlParams = new URLSearchParams(window.location.search);
         const tab = urlParams.get('tab');
         if (tab) switchTab(tab);
+
+        // Chart Initialization
+        const ctx = document.getElementById('pipelineChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Applied', 'Shortlisted', 'Interview', 'Selected'],
+                datasets: [{
+                    data: [
+                        /*[[${student.applicationsSubmitted}]]*/ 0, 
+                        /*[[${student.shortlistedCount}]]*/ 0, 
+                        /*[[${student.interviewsScheduled}]]*/ 0, 
+                        /*[[${student.placed ? 1 : 0}]]*/ 0
+                    ],
+                    backgroundColor: ['#3B82F6', '#F59E0B', '#8B5CF6', '#10B981'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+                },
+                cutout: '70%'
+            }
+        });
 
         async function fetchAIAdvice() {
             const btn = document.getElementById('ai-btn');

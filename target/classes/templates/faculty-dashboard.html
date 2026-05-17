@@ -2,225 +2,262 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Faculty Dashboard | PlacementPro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Admin | PlacementPro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <script src="/js/main.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .tab-btn.active { border-color: #0d9488; color: #0d9488; background: #f0fdfa; }
+        body { font-family: 'Outfit', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-[#F4F6FA] min-h-screen flex">
 
-    <!-- Nav -->
-    <nav class="bg-teal-700 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
-            <div class="flex items-center space-x-3">
-                <span class="text-2xl">🛡️</span>
-                <span class="font-bold text-xl">PlacementPro</span>
-                <span class="px-2 py-0.5 text-xs font-bold bg-teal-800/60 rounded ml-3 uppercase tracking-widest text-teal-200">Faculty Admin</span>
-            </div>
-            <div class="flex items-center space-x-5">
-                <div class="relative cursor-pointer" onclick="switchTab('notifications')">
-                    <svg class="w-6 h-6 text-teal-200 hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                    <span th:if="${unreadCount > 0}" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold" th:text="${unreadCount}">0</span>
-                </div>
-                <span class="text-teal-100 font-medium" th:text="${facultyName}">Faculty</span>
-                <a th:href="@{/faculty/reports}" class="bg-teal-600 border border-teal-500 hover:bg-teal-500 px-3 py-1.5 rounded-lg text-sm font-medium transition">📊 Reports</a>
-                <a th:href="@{/logout}" class="bg-teal-600 border border-teal-500 hover:bg-teal-500 px-3 py-1.5 rounded-lg text-sm font-medium transition">Sign Out</a>
-            </div>
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#1E2A3B] text-white flex-shrink-0 flex flex-col fixed h-full z-20 transition-all duration-300">
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-xl shadow-lg shadow-indigo-900/20">🛡️</div>
+            <span class="font-bold text-xl tracking-tight">PlacementPro</span>
         </div>
-    </nav>
-
-    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <h1 class="text-2xl font-bold text-slate-800 mb-6">Admin Panel 🛡️</h1>
-
-        <!-- Stats -->
-        <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 text-center">
-                <p class="text-slate-400 text-xs font-bold uppercase mb-1">Students</p>
-                <p class="text-2xl font-black text-indigo-600" th:text="${stats['totalStudents']}">0</p>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 text-center">
-                <p class="text-slate-400 text-xs font-bold uppercase mb-1">Placed</p>
-                <p class="text-2xl font-black text-emerald-600" th:text="${stats['placedStudents']}">0</p>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 text-center">
-                <p class="text-slate-400 text-xs font-bold uppercase mb-1">Companies</p>
-                <p class="text-2xl font-black text-teal-600" th:text="${stats['totalCompanies']}">0</p>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 text-center">
-                <p class="text-slate-400 text-xs font-bold uppercase mb-1">Active Jobs</p>
-                <p class="text-2xl font-black text-violet-600" th:text="${stats['activeJobs']}">0</p>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 text-center">
-                <p class="text-slate-400 text-xs font-bold uppercase mb-1">Applications</p>
-                <p class="text-2xl font-black text-amber-500" th:text="${stats['totalApplications']}">0</p>
-            </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-red-100 text-center">
-                <p class="text-red-400 text-xs font-bold uppercase mb-1">At Risk</p>
-                <p class="text-2xl font-black text-red-500" th:text="${stats['atRisk']}">0</p>
-            </div>
-        </div>
-
-        <!-- Tabs -->
-        <div class="flex space-x-1 border-b border-slate-200 mb-6 overflow-x-auto">
-            <button onclick="switchTab('students')" id="tab-students" class="tab-btn active px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 transition whitespace-nowrap">Students</button>
-            <button onclick="switchTab('companies')" id="tab-companies" class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 transition whitespace-nowrap">Companies</button>
-            <button onclick="switchTab('applications')" id="tab-applications" class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 transition whitespace-nowrap">Applications</button>
-            <button onclick="switchTab('atrisk')" id="tab-atrisk" class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 transition whitespace-nowrap">At-Risk</button>
-            <button onclick="switchTab('notifications')" id="tab-notifications" class="tab-btn px-4 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 transition whitespace-nowrap">
-                Notifications <span th:if="${unreadCount > 0}" class="ml-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full" th:text="${unreadCount}">0</span>
+        
+        <nav class="flex-1 mt-6 px-4 space-y-2">
+            <button onclick="switchTab('students')" id="tab-students" class="sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-[#A8B9CC] hover:bg-white/5 transition-all">
+                <span>👥</span> Students
             </button>
-        </div>
+            <button onclick="switchTab('companies')" id="tab-companies" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-[#A8B9CC] hover:bg-white/5 transition-all">
+                <span>🏢</span> Companies
+            </button>
+            <button onclick="switchTab('applications')" id="tab-applications" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-[#A8B9CC] hover:bg-white/5 transition-all">
+                <span>📋</span> Applications
+            </button>
+            <button onclick="switchTab('atrisk')" id="tab-atrisk" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-[#A8B9CC] hover:bg-white/5 transition-all">
+                <span>⚠️</span> At-Risk
+            </button>
+            <button onclick="switchTab('notifications')" id="tab-notifications" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-[#A8B9CC] hover:bg-white/5 transition-all relative">
+                <span>🔔</span> Notifications
+                <span th:if="${unreadCount > 0}" class="absolute right-4 top-1/2 -translate-y-1/2 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full border-2 border-[#1E2A3B]" th:text="${unreadCount}">0</span>
+            </button>
+            <a th:href="@{/faculty/reports}" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-[#A8B9CC] hover:bg-white/5 transition-all">
+                <span>📊</span> Reports
+            </a>
+        </nav>
 
-        <!-- TAB: Students -->
-        <div id="panel-students" class="tab-panel">
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-slate-50"><tr>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">USN</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Name</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Dept</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">CGPA</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Email</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Placed</th>
-                    </tr></thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <tr th:each="s : ${students}">
-                            <td class="px-4 py-3 text-sm font-mono text-slate-700" th:text="${s['Student_USN']}">USN</td>
-                            <td class="px-4 py-3 text-sm font-medium text-slate-800" th:text="${s['Name']}">Name</td>
-                            <td class="px-4 py-3 text-sm text-slate-500" th:text="${s['Dept']}">Dept</td>
-                            <td class="px-4 py-3 text-sm font-semibold text-indigo-600" th:text="${s['CGPA']}">CGPA</td>
-                            <td class="px-4 py-3 text-sm text-slate-500" th:text="${s['Email']}">Email</td>
-                            <td class="px-4 py-3">
-                                <span th:if="${s['Is_Placed'] == true}" class="px-2 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-700">Yes</span>
-                                <span th:unless="${s['Is_Placed'] == true}" class="px-2 py-0.5 text-xs font-bold rounded-full bg-slate-100 text-slate-400">No</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- TAB: Companies -->
-        <div id="panel-companies" class="tab-panel hidden">
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-slate-50"><tr>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">ID</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Company Name</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Location</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">HR Contact</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Verified</th>
-                    </tr></thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <tr th:each="c : ${companies}">
-                            <td class="px-4 py-3 text-sm font-mono text-slate-700" th:text="${c['Company_ID']}">ID</td>
-                            <td class="px-4 py-3 text-sm font-medium text-slate-800" th:text="${c['Company_Name']}">Name</td>
-                            <td class="px-4 py-3 text-sm text-slate-500" th:text="${c['Location']}">Loc</td>
-                            <td class="px-4 py-3 text-sm text-slate-500" th:text="${c['HR_Contact']}">HR</td>
-                            <td class="px-4 py-3">
-                                <span th:if="${c['Is_Verified'] == true}" class="px-2 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-700">✓</span>
-                                <span th:unless="${c['Is_Verified'] == true}" class="px-2 py-0.5 text-xs font-bold rounded-full bg-red-100 text-red-500">✗</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- TAB: Applications Pipeline (uses vw_application_pipeline) -->
-        <div id="panel-applications" class="tab-panel hidden">
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-slate-50"><tr>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Student</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">USN</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">CGPA</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Company</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Role</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Status</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Applied</th>
-                    </tr></thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <tr th:each="p : ${pipeline}">
-                            <td class="px-4 py-3 text-sm font-medium text-slate-800" th:text="${p['Student_Name']}">Name</td>
-                            <td class="px-4 py-3 text-sm font-mono text-slate-600" th:text="${p['USN']}">USN</td>
-                            <td class="px-4 py-3 text-sm font-semibold text-indigo-600" th:text="${p['CGPA']}">CGPA</td>
-                            <td class="px-4 py-3 text-sm text-slate-700" th:text="${p['Company_Name']}">Company</td>
-                            <td class="px-4 py-3 text-sm text-slate-500" th:text="${p['Role_Name']}">Role</td>
-                            <td class="px-4 py-3">
-                                <span class="px-2 py-0.5 text-xs font-bold rounded-full"
-                                      th:classappend="${p['Status'] == 'Selected' ? 'bg-emerald-100 text-emerald-700' : (p['Status'] == 'Rejected' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-700')}"
-                                      th:text="${p['Status']}">Status</span>
-                            </td>
-                            <td class="px-4 py-3 text-sm text-slate-400" th:text="${p['Apply_Date']}">Date</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- TAB: At-Risk Students (Q1 query) -->
-        <div id="panel-atrisk" class="tab-panel hidden">
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <div class="p-4 bg-red-50 border-b border-red-100">
-                    <p class="text-sm font-semibold text-red-700">⚠️ Students with ZERO applications and not yet placed</p>
+        <div class="p-6 border-t border-white/5">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-xs" th:text="${facultyName.substring(0,1)}">F</div>
+                <div class="overflow-hidden">
+                    <p class="text-xs font-bold truncate" th:text="${facultyName}">Admin</p>
+                    <p class="text-[10px] text-[#64748B]">Faculty Account</p>
                 </div>
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-slate-50"><tr>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">USN</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Name</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Dept</th>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">CGPA</th>
-                    </tr></thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <tr th:each="r : ${atRisk}">
-                            <td class="px-4 py-3 text-sm font-mono text-slate-700" th:text="${r['Student_USN']}">USN</td>
-                            <td class="px-4 py-3 text-sm font-medium text-slate-800" th:text="${r['Name']}">Name</td>
-                            <td class="px-4 py-3 text-sm text-slate-500" th:text="${r['Dept']}">Dept</td>
-                            <td class="px-4 py-3 text-sm font-semibold text-indigo-600" th:text="${r['CGPA']}">CGPA</td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
+            <a th:href="@{/logout}" class="flex items-center gap-2 text-xs font-bold text-red-400 hover:text-red-300 transition-colors">
+                <span>🚪</span> Sign Out
+            </a>
         </div>
+    </aside>
 
-        <!-- TAB: Notifications -->
-        <div id="panel-notifications" class="tab-panel hidden">
-            <div class="flex justify-end mb-3">
-                <form th:action="@{/faculty/notifications/mark-all-read}" method="post">
-                    <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition">Mark All Read</button>
-                </form>
+    <!-- Content Area -->
+    <div class="flex-1 ml-64 flex flex-col min-h-screen">
+        <!-- Top Bar -->
+        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-10 px-8 flex items-center justify-between">
+            <h1 id="screen-title" class="text-xl font-extrabold text-slate-800 tracking-tight">Student Management</h1>
+            <div class="flex items-center gap-4">
+                <div class="bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
+                    <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest">Live Sync Active</span>
+                </div>
             </div>
-            <div class="space-y-3">
-                <div th:each="notif : ${notifications}" class="bg-white rounded-xl shadow-sm border p-4 flex items-start space-x-3"
-                     th:classappend="${!notif.read ? 'border-teal-200 bg-teal-50/30' : 'border-slate-200'}">
-                    <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                         th:classappend="${!notif.read ? 'bg-teal-100 text-teal-600' : 'bg-slate-100 text-slate-400'}">🔔</div>
-                    <div class="flex-1">
-                        <p class="text-sm text-slate-700" th:text="${notif.message}">Message</p>
-                        <p class="text-xs text-slate-400 mt-1" th:text="${notif.createdAt}">Time</p>
+        </header>
+
+        <main class="p-8">
+            <!-- Analytics Overview -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+                <div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover">
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Total Students</p>
+                        <p class="text-4xl font-black text-indigo-600" th:text="${stats['totalStudents']}">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover">
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Placed Students</p>
+                        <p class="text-4xl font-black text-emerald-500" th:text="${stats['placedStudents']}">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover">
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">At Risk</p>
+                        <p class="text-4xl font-black text-red-500" th:text="${stats['atRisk']}">0</p>
                     </div>
                 </div>
-                <div th:if="${notifications.isEmpty()}" class="text-center py-12 text-slate-400 bg-white rounded-xl border">
-                    <p>No notifications.</p>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <canvas id="miniPipelineChart" height="150"></canvas>
                 </div>
             </div>
-        </div>
-    </main>
 
-    <script>
+            <!-- TAB: Students -->
+            <div id="panel-students" class="tab-panel animate-in fade-in duration-300">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-slate-100">
+                        <thead class="bg-slate-50/50"><tr>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">USN</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Name</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Department</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">CGPA</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
+                        </tr></thead>
+                        <tbody class="divide-y divide-slate-50">
+                            <tr th:each="s : ${students}" class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4 text-sm font-bold text-slate-600" th:text="${s['Student_USN']}">USN</td>
+                                <td class="px-6 py-4 text-sm font-semibold text-slate-800" th:text="${s['Name']}">Name</td>
+                                <td class="px-6 py-4 text-sm text-slate-500" th:text="${s['Dept']}">Dept</td>
+                                <td class="px-6 py-4 text-sm font-bold text-indigo-600" th:text="${s['CGPA']}">CGPA</td>
+                                <td class="px-6 py-4">
+                                    <span th:if="${s['Is_Placed'] == true}" class="status-chip chip-selected">Placed</span>
+                                    <span th:unless="${s['Is_Placed'] == true}" class="status-chip bg-slate-100 text-slate-400">Not Placed</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Other panels following same style... (abbreviated for the replace tool) -->
+            <div id="panel-companies" class="tab-panel hidden">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-slate-100">
+                        <thead class="bg-slate-50/50"><tr>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Company</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Location</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">HR Contact</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Verification</th>
+                        </tr></thead>
+                        <tbody class="divide-y divide-slate-50">
+                            <tr th:each="c : ${companies}" class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4 text-sm font-bold text-slate-800" th:text="${c['Company_Name']}">Name</td>
+                                <td class="px-6 py-4 text-sm text-slate-500" th:text="${c['Location']}">Loc</td>
+                                <td class="px-6 py-4 text-sm text-slate-500" th:text="${c['HR_Contact']}">HR</td>
+                                <td class="px-6 py-4">
+                                    <span th:if="${c['Is_Verified'] == true}" class="status-chip chip-selected">Verified</span>
+                                    <span th:unless="${c['Is_Verified'] == true}" class="status-chip chip-rejected">Pending</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="panel-applications" class="tab-panel hidden">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-slate-100">
+                        <thead class="bg-slate-50/50"><tr>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Student</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Company</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Role</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
+                        </tr></thead>
+                        <tbody class="divide-y divide-slate-50">
+                            <tr th:each="p : ${pipeline}" class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4">
+                                    <p class="text-sm font-bold text-slate-800" th:text="${p['Student_Name']}">Name</p>
+                                    <p class="text-[10px] text-slate-400 font-bold" th:text="${p['USN']}">USN</p>
+                                </td>
+                                <td class="px-6 py-4 text-sm font-semibold text-slate-600" th:text="${p['Company_Name']}">Company</td>
+                                <td class="px-6 py-4 text-sm text-slate-500" th:text="${p['Role_Name']}">Role</td>
+                                <td class="px-6 py-4">
+                                    <span class="status-chip"
+                                          th:classappend="${p['Status'] == 'Selected' ? 'chip-selected' : (p['Status'] == 'Rejected' ? 'chip-rejected' : 'chip-applied')}"
+                                          th:text="${p['Status']}">Status</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="panel-atrisk" class="tab-panel hidden">
+                <div class="bg-red-50/50 p-6 rounded-t-2xl border-x border-t border-red-100 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-red-800 font-bold">Unplaced Students with Zero Applications</h3>
+                        <p class="text-red-600/70 text-xs font-medium">These students require immediate intervention.</p>
+                    </div>
+                    <button class="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-red-200">Send Alert</button>
+                </div>
+                <div class="bg-white rounded-b-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-50">
+                            <tr th:each="r : ${atRisk}" class="hover:bg-red-50/30 transition-colors">
+                                <td class="px-6 py-4 text-sm font-bold text-slate-700 font-mono" th:text="${r['Student_USN']}">USN</td>
+                                <td class="px-6 py-4 text-sm font-semibold text-slate-800" th:text="${r['Name']}">Name</td>
+                                <td class="px-6 py-4 text-sm text-slate-500" th:text="${r['Dept']}">Dept</td>
+                                <td class="px-6 py-4 text-sm font-bold text-red-600" th:text="${r['CGPA']}">CGPA</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="panel-notifications" class="tab-panel hidden">
+                <div class="max-w-3xl space-y-4">
+                    <div th:each="notif : ${notifications}" class="bg-white p-5 rounded-2xl shadow-sm border flex gap-4 items-start"
+                         th:classappend="${!notif.read ? 'border-indigo-200 bg-indigo-50/30' : 'border-slate-200'}">
+                        <div class="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-lg"
+                             th:classappend="${!notif.read ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400'}">🔔</div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-800 leading-relaxed" th:text="${notif.message}">Message</p>
+                            <p class="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest" th:text="${notif.createdAt}">Time</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script th:inline="javascript">
         function switchTab(tab) {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
             document.getElementById('panel-' + tab).classList.remove('hidden');
             document.getElementById('tab-' + tab).classList.add('active');
+            
+            const titles = {
+                'students': 'Student Management',
+                'companies': 'Company Directory',
+                'applications': 'Global Pipeline',
+                'atrisk': 'At-Risk Monitoring',
+                'notifications': 'System Notifications'
+            };
+            document.getElementById('screen-title').innerText = titles[tab] || 'Dashboard';
         }
+
         const urlParams = new URLSearchParams(window.location.search);
         const tab = urlParams.get('tab');
         if (tab) switchTab(tab);
+
+        // Faculty Stats Chart
+        const ctx = document.getElementById('miniPipelineChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Students', 'Placed', 'At Risk'],
+                datasets: [{
+                    label: 'Count',
+                    data: [
+                        /*[[${stats['totalStudents']}]]*/ 0, 
+                        /*[[${stats['placedStudents']}]]*/ 0, 
+                        /*[[${stats['atRisk']}]]*/ 0
+                    ],
+                    backgroundColor: ['#1A56DB', '#10B981', '#EF4444'],
+                    borderRadius: 12,
+                    barThickness: 20
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { beginAtZero: true, grid: { display: false }, ticks: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
     </script>
 </body>
 </html>

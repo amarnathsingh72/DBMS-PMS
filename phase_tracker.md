@@ -40,7 +40,7 @@ Use this document to track our progression through the PlacementPro build. Check
 - [x] P5.4 — Report Panel + Stored Procedure Call
 
 ## ✨ Phase 6: Gemini AI Integration + Polish
-- [ ] P6.1 — Gemini API Client
-- [ ] P6.2 — AI Advice UI Integration
-- [ ] P6.3 — Final Polish Checklist
-- [ ] P6.4 — CSV Export (Bonus)
+- [x] P6.1 — Gemini API Client
+- [x] P6.2 — AI Advice UI Integration
+- [x] P6.3 — Final Polish Checklist
+- [x] P6.4 — CSV Export (Bonus)

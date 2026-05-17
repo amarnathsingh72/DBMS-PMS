@@ -3,6 +3,7 @@ package com.placementpro.controller;
 import com.placementpro.dto.NotificationDTO;
 import com.placementpro.service.FacultyService;
 import com.placementpro.service.NotificationService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -75,5 +77,28 @@ public class FacultyController {
         if (facultyId == null) return "redirect:/login";
         notificationService.markAllAsRead(facultyId, "FACULTY");
         return "redirect:/faculty/dashboard?tab=notifications";
+    }
+
+    @GetMapping("/reports/export")
+    public void exportReport(HttpSession session, HttpServletResponse response) throws IOException {
+        String role = (String) session.getAttribute("role");
+        if (role == null || !"FACULTY".equals(role)) return;
+
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=placement_report.csv");
+
+        List<Map<String, Object>> deptReport = facultyService.getDeptPlacementReport();
+        
+        StringBuilder csv = new StringBuilder();
+        csv.append("Department,Total Students,Placed Students,Placement %,Avg Package (LPA)\n");
+        for (Map<String, Object> row : deptReport) {
+            csv.append(row.get("Dept")).append(",")
+               .append(row.get("Total_Students")).append(",")
+               .append(row.get("Placed_Students")).append(",")
+               .append(row.get("Placement_Percentage")).append(",")
+               .append(row.get("Avg_Package_LPA") != null ? row.get("Avg_Package_LPA") : "0").append("\n");
+        }
+
+        response.getWriter().write(csv.toString());
     }
 }
