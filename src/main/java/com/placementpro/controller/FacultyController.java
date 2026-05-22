@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,6 +53,21 @@ public class FacultyController {
         model.addAttribute("unreadCount", unreadCount);
 
         return "faculty-dashboard";
+    }
+
+    @PostMapping("/send-alerts")
+    public String sendAlerts(HttpSession session, RedirectAttributes redirectAttributes) {
+        String role = (String) session.getAttribute("role");
+        String facultyId = (String) session.getAttribute("userId");
+        if (role == null || !"FACULTY".equals(role)) return "redirect:/login";
+
+        int alertCount = facultyService.sendRiskAlerts(facultyId);
+        if (alertCount > 0) {
+            redirectAttributes.addFlashAttribute("alertSuccess", "Urgent intervention warnings successfully sent to " + alertCount + " at-risk students and faculty members!");
+        } else {
+            redirectAttributes.addFlashAttribute("alertInfo", "No unplaced students with zero applications found to alert.");
+        }
+        return "redirect:/faculty/dashboard?tab=atrisk";
     }
 
     @GetMapping("/reports")

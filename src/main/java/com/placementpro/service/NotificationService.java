@@ -41,4 +41,14 @@ public class NotificationService {
     public void markAllAsRead(String userId, String role) {
         jdbcTemplate.update("UPDATE NOTIFICATIONS SET Is_Read = TRUE WHERE User_ID = ? AND User_Role = ?", userId, role);
     }
+
+    /**
+     * Creates an in-app notification in the database.
+     */
+    public void createNotification(String userId, String userRole, String message, String notifType) {
+        jdbcTemplate.update(
+            "INSERT INTO NOTIFICATIONS (User_ID, User_Role, Message, Notif_Type) VALUES (?, ?, ?, ?)",
+            userId, userRole, message, notifType
+        );
+    }
 }

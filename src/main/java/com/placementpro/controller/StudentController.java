@@ -4,6 +4,7 @@ import com.placementpro.dto.ApplicationDTO;
 import com.placementpro.dto.JobPostingDTO;
 import com.placementpro.dto.NotificationDTO;
 import com.placementpro.dto.StudentDTO;
+import com.placementpro.service.GeminiService;
 import com.placementpro.service.NotificationService;
 import com.placementpro.service.StudentService;
 import jakarta.servlet.http.HttpSession;
@@ -28,7 +29,7 @@ public class StudentController {
     private NotificationService notificationService;
 
     @Autowired
-    private com.placementpro.service.GeminiService geminiService;
+    private GeminiService geminiService;
 
     @GetMapping("/ai-advice")
     public String getAiAdvice(HttpSession session, Model model) {

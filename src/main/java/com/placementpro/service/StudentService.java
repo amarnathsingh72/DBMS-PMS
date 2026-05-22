@@ -17,7 +17,7 @@ public class StudentService {
     private JdbcTemplate jdbcTemplate;
 
     public StudentDTO getStudentDashboardInfo(String usn) {
-        String profileQuery = "SELECT Name, Dept, CGPA, Is_Placed FROM STUDENT WHERE Student_USN = ?";
+        String profileQuery = "SELECT Name, Dept, CGPA, Is_Placed, Email, Phone FROM STUDENT WHERE Student_USN = ?";
 
         StudentDTO dto = jdbcTemplate.queryForObject(profileQuery, (rs, rowNum) -> {
             StudentDTO s = new StudentDTO();
@@ -26,6 +26,8 @@ public class StudentService {
             s.setDept(rs.getString("Dept"));
             s.setCgpa(rs.getDouble("CGPA"));
             s.setPlaced(rs.getBoolean("Is_Placed"));
+            s.setEmail(rs.getString("Email"));
+            s.setPhone(rs.getString("Phone"));
             return s;
         }, usn);
 

@@ -3,21 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlacementPro | Login</title>
+    <title>PlacementPro | Portal Access</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Outfit', sans-serif; }
         .glass-card {
-            background: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.4);
         }
         .bg-dynamic {
-            background: linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.4)), url('/images/login_bg.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%);
         }
         @keyframes float {
             0% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
@@ -27,84 +24,350 @@
         .floating-orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(40px);
-            z-index: -1;
-            animation: float 10s ease-in-out infinite;
+            filter: blur(50px);
+            z-index: 0;
+            animation: float 12s ease-in-out infinite;
         }
     </style>
 </head>
-<body class="bg-dynamic min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+<body class="bg-dynamic min-h-screen flex items-center justify-center p-4 md:p-8 relative overflow-x-hidden overflow-y-auto">
     
-    <!-- Dynamic Orbs -->
-    <div class="floating-orb w-64 h-64 bg-indigo-500/30 top-1/4 -left-32"></div>
-    <div class="floating-orb w-96 h-96 bg-blue-500/20 bottom-1/4 -right-48" style="animation-delay: -5s;"></div>
+    <!-- Dynamic Background Orbs -->
+    <div class="floating-orb w-72 h-72 bg-indigo-600/30 top-1/4 -left-32"></div>
+    <div class="floating-orb w-96 h-96 bg-emerald-500/20 bottom-1/4 -right-48" style="animation-delay: -6s;"></div>
+    <div class="floating-orb w-80 h-80 bg-violet-600/20 top-10 right-10" style="animation-delay: -3s;"></div>
 
-    <div class="glass-card w-full max-w-md p-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] transform transition-all hover:scale-[1.01]">
-        <div class="text-center mb-10">
-            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-indigo-600 shadow-xl shadow-indigo-200 mb-6 transform -rotate-6">
-                <span class="text-4xl">🎓</span>
+    <div class="glass-card w-full max-w-lg p-6 md:p-8 rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.5)] relative z-10 transform transition-all duration-300">
+        
+        <!-- Logo & Header -->
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-500/30 mb-4 transform -rotate-3 hover:rotate-0 transition-transform duration-300 cursor-pointer">
+                <span class="text-3xl">🎓</span>
             </div>
-            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">PlacementPro</h1>
-            <p class="text-slate-600 mt-2 font-medium">Elevating Career Pipelines</p>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">PlacementPro</h1>
+            <p class="text-slate-500 text-sm mt-1 font-medium">Elevating College Placement Workflows</p>
         </div>
 
-        <form th:action="@{/login}" method="post" class="space-y-6">
-            
-            <div class="bg-white/50 p-1 rounded-2xl flex gap-1 mb-8 shadow-inner">
-                <button type="button" onclick="setRole('STUDENT')" id="btn-STUDENT" class="role-btn flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 bg-indigo-600 text-white shadow-lg shadow-indigo-200">Student</button>
-                <button type="button" onclick="setRole('FACULTY')" id="btn-FACULTY" class="role-btn flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 text-slate-600 hover:bg-white/80">Faculty</button>
-                <button type="button" onclick="setRole('COMPANY')" id="btn-COMPANY" class="role-btn flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 text-slate-600 hover:bg-white/80">Company</button>
-            </div>
+        <!-- Mode Toggle: Login / Register -->
+        <div class="grid grid-cols-2 bg-slate-100 p-1.5 rounded-2xl mb-6 shadow-inner">
+            <button type="button" onclick="setMode('login')" id="btn-login-mode" class="py-2.5 text-xs font-extrabold rounded-xl transition-all duration-300 bg-white text-indigo-600 shadow-sm border border-slate-200/50">SIGN IN</button>
+            <button type="button" onclick="setMode('signup')" id="btn-signup-mode" class="py-2.5 text-xs font-extrabold rounded-xl transition-all duration-300 text-slate-500 hover:text-indigo-600">REGISTER</button>
+        </div>
 
-            <input type="hidden" name="role" id="roleInput" value="STUDENT">
+        <!-- Role Selectors -->
+        <div class="bg-indigo-50/50 p-1 rounded-2xl flex gap-1 mb-6 border border-indigo-100/50">
+            <button type="button" onclick="setRole('STUDENT')" id="btn-STUDENT" class="role-btn flex-1 py-3 text-xs font-black rounded-xl transition-all duration-300 bg-indigo-600 text-white shadow-md shadow-indigo-500/20">STUDENT</button>
+            <button type="button" onclick="setRole('FACULTY')" id="btn-FACULTY" class="role-btn flex-1 py-3 text-xs font-black rounded-xl transition-all duration-300 text-slate-600 hover:bg-white/80">FACULTY</button>
+            <button type="button" onclick="setRole('COMPANY')" id="btn-COMPANY" class="role-btn flex-1 py-3 text-xs font-black rounded-xl transition-all duration-300 text-slate-600 hover:bg-white/80">COMPANY</button>
+        </div>
 
-            <div class="space-y-2">
-                <label id="idLabel" class="block text-xs font-bold text-indigo-900/60 uppercase tracking-widest ml-1">USN</label>
-                <div class="relative group">
+        <!-- Message Alerts -->
+        <div th:if="${error}" class="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-100 text-rose-700 text-xs font-bold flex items-center gap-3 animate-pulse">
+            <span>⚠️</span>
+            <span th:text="${error}">An error occurred.</span>
+        </div>
+        <div th:if="${success}" class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold flex items-center gap-3">
+            <span>✅</span>
+            <span th:text="${success}">Success message!</span>
+        </div>
+
+        <!-- Form container -->
+        <div>
+            <!-- 1. LOGIN FORM -->
+            <form th:action="@{/login}" method="post" id="loginForm" class="space-y-4">
+                <input type="hidden" name="role" id="loginRoleInput" value="STUDENT">
+                
+                <div class="space-y-1.5">
+                    <label id="loginIdLabel" class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">USN</label>
                     <input type="text" name="username" required
-                           class="w-full pl-4 pr-4 py-4 rounded-2xl border-0 bg-white/80 focus:bg-white ring-1 ring-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm group-hover:shadow-md"
-                           placeholder="Enter your ID">
+                           class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800"
+                           placeholder="Enter your credential ID">
                 </div>
-            </div>
 
-            <div class="space-y-2">
-                <label class="block text-xs font-bold text-indigo-900/60 uppercase tracking-widest ml-1">Password</label>
-                <div class="relative group">
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">Password</label>
                     <input type="password" name="password" required
-                           class="w-full pl-4 pr-4 py-4 rounded-2xl border-0 bg-white/80 focus:bg-white ring-1 ring-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm group-hover:shadow-md"
+                           class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800"
                            placeholder="••••••••">
                 </div>
-            </div>
 
-            <div th:if="${error}" class="p-4 rounded-2xl bg-red-50/80 backdrop-blur-sm text-red-600 text-sm border border-red-100 flex items-center gap-3 animate-[shake_0.5s_ease-in-out]">
-                <span class="text-lg">⚠️</span>
-                <span th:text="${error}" class="font-semibold">Error message here</span>
-            </div>
+                <button type="submit" 
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-4 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-2 text-xs uppercase tracking-wider">
+                    <span>Enter Portal</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                </button>
+            </form>
 
-            <button type="submit" 
-                    class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-5 rounded-2xl shadow-xl shadow-indigo-200 transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-2 group">
-                <span>Sign In to Portal</span>
-                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-            </button>
-        </form>
+            <!-- 2. SIGNUP FORM -->
+            <form th:action="@{/signup}" method="post" id="signupForm" class="space-y-4 hidden">
+                <input type="hidden" name="role" id="signupRoleInput" value="STUDENT">
 
-        <div class="mt-10 text-center">
-            <p class="text-xs text-slate-500 font-medium tracking-wide">&copy; 2026 PLACEMENTPRO SYSTEM &bull; V2.0</p>
+                <!-- Dynamic signup fields based on role -->
+
+                <!-- Student specific & Faculty ID -->
+                <div id="div-username" class="space-y-1.5">
+                    <label id="signupIdLabel" class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">USN</label>
+                    <input type="text" name="username" id="input-username"
+                           class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800"
+                           placeholder="e.g. 4SF24CI001">
+                </div>
+
+                <!-- Generic Full Name (Student/Faculty) -->
+                <div id="div-name" class="space-y-1.5">
+                    <label class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">Full Name</label>
+                    <input type="text" name="name" id="input-name"
+                           class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800"
+                           placeholder="Enter full name">
+                </div>
+
+                <!-- Email address -->
+                <div id="div-email" class="space-y-1.5">
+                    <label class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">Email Address</label>
+                    <input type="email" name="email" id="input-email"
+                           class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800"
+                           placeholder="name@university.com">
+                </div>
+
+                <!-- Phone (Student) -->
+                <div id="div-phone" class="space-y-1.5">
+                    <label class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">Phone Number</label>
+                    <input type="text" name="phone" id="input-phone"
+                           class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800"
+                           placeholder="e.g. +91 9876543210">
+                </div>
+
+                <!-- Department (Student/Faculty) -->
+                <div id="div-dept" class="space-y-1.5">
+                    <label class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">Department</label>
+                    <select name="dept" id="input-dept"
+                            class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800">
+                        <option value="CSE">Computer Science & Eng (CSE)</option>
+                        <option value="ECE">Electronics & Comm Eng (ECE)</option>
+                        <option value="MECH">Mechanical Engineering (MECH)</option>
+                        <option value="CIVIL">Civil Engineering (CIVIL)</option>
+                    </select>
+                </div>
+
+                <!-- Student academic details -->
+                <div id="div-student-academic" class="grid grid-cols-2 gap-3">
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">Semester</label>
+                        <input type="number" name="semester" id="input-semester" min="1" max="8"
+                               class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800"
+                               placeholder="4">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">Current CGPA</label>
+                        <input type="number" step="0.01" name="cgpa" id="input-cgpa" min="0" max="10"
+                               class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800"
+                               placeholder="8.50">
+                    </div>
+                </div>
+
+                <!-- Faculty placement officer toggle -->
+                <div id="div-faculty-po" class="flex items-center gap-3 bg-indigo-50/30 p-3.5 border border-indigo-100/50 rounded-xl hidden">
+                    <input type="checkbox" name="isPlacementOfficer" id="input-po" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
+                    <label for="input-po" class="text-xs font-bold text-slate-700 cursor-pointer">Designate as Placement Officer</label>
+                </div>
+
+                <!-- COMPANY SPECIFIC FIELDS -->
+                <div id="div-company-details" class="space-y-4 hidden">
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">Company Name</label>
+                        <input type="text" name="companyName" id="input-company-name"
+                               class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800"
+                               placeholder="e.g. Google India">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1.5">
+                            <label class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">Location</label>
+                            <input type="text" name="location" id="input-location"
+                                   class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800"
+                                   placeholder="e.g. Bangalore">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">HR Contact Email</label>
+                            <input type="email" name="hrContact" id="input-hr"
+                                   class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800"
+                                   placeholder="hr@company.com">
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">Website URL</label>
+                        <input type="text" name="website" id="input-website"
+                               class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800"
+                               placeholder="e.g. www.company.com">
+                    </div>
+                </div>
+
+                <!-- Password (All roles) -->
+                <div id="div-password" class="space-y-1.5">
+                    <label class="block text-[10px] font-black text-indigo-900/50 uppercase tracking-widest ml-1">Password</label>
+                    <input type="password" name="password" id="input-password"
+                           class="w-full px-4 py-3.5 rounded-xl bg-white/70 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-sm font-semibold text-slate-800"
+                           placeholder="Choose a strong password">
+                </div>
+
+                <button type="submit" 
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-4 rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-2 text-xs uppercase tracking-wider">
+                    <span>Create Account</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                </button>
+            </form>
+        </div>
+
+        <div class="mt-6 text-center border-t border-slate-200/50 pt-4">
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">&copy; 2026 PLACEMENTPRO SYSTEM &bull; V3.0</p>
         </div>
     </div>
 
-    <script>
-        function setRole(role) {
-            document.getElementById('roleInput').value = role;
-            document.getElementById('idLabel').innerText = role === 'STUDENT' ? 'USN' : (role === 'FACULTY' ? 'Faculty ID' : 'Company ID');
+    <!-- Script to manage switching Sign In / Register and different Roles -->
+    <script th:inline="javascript">
+        let currentMode = 'login';
+        let currentRole = 'STUDENT';
+
+        function setMode(mode) {
+            currentMode = mode;
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
             
+            const btnLogin = document.getElementById('btn-login-mode');
+            const btnSignup = document.getElementById('btn-signup-mode');
+
+            if (mode === 'login') {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                
+                btnLogin.className = "py-2.5 text-xs font-extrabold rounded-xl transition-all duration-300 bg-white text-indigo-600 shadow-sm border border-slate-200/50";
+                btnSignup.className = "py-2.5 text-xs font-extrabold rounded-xl transition-all duration-300 text-slate-500 hover:text-indigo-600";
+            } else {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                
+                btnSignup.className = "py-2.5 text-xs font-extrabold rounded-xl transition-all duration-300 bg-white text-indigo-600 shadow-sm border border-slate-200/50";
+                btnLogin.className = "py-2.5 text-xs font-extrabold rounded-xl transition-all duration-300 text-slate-500 hover:text-indigo-600";
+            }
+            adjustFields();
+        }
+
+        function setRole(role) {
+            currentRole = role;
+            document.getElementById('loginRoleInput').value = role;
+            document.getElementById('signupRoleInput').value = role;
+
+            document.getElementById('loginIdLabel').innerText = role === 'STUDENT' ? 'USN' : (role === 'FACULTY' ? 'Faculty ID' : 'Company ID');
+            document.getElementById('signupIdLabel').innerText = role === 'STUDENT' ? 'USN' : 'Faculty ID';
+
             document.querySelectorAll('.role-btn').forEach(btn => {
-                btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-200');
-                btn.classList.add('text-slate-600', 'hover:bg-white/80');
+                btn.className = "role-btn flex-1 py-3 text-xs font-black rounded-xl transition-all duration-300 text-slate-600 hover:bg-white/80";
             });
+
             const activeBtn = document.getElementById('btn-' + role);
-            activeBtn.classList.remove('text-slate-600', 'hover:bg-white/80');
-            activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-200');
+            activeBtn.className = "role-btn flex-1 py-3 text-xs font-black rounded-xl transition-all duration-300 bg-indigo-600 text-white shadow-md shadow-indigo-500/20";
+            
+            adjustFields();
+        }
+
+        function adjustFields() {
+            // Fields wrapper
+            const divUsername = document.getElementById('div-username');
+            const divName = document.getElementById('div-name');
+            const divEmail = document.getElementById('div-email');
+            const divPhone = document.getElementById('div-phone');
+            const divDept = document.getElementById('div-dept');
+            const divAcademic = document.getElementById('div-student-academic');
+            const divFacultyPO = document.getElementById('div-faculty-po');
+            const divCompany = document.getElementById('div-company-details');
+
+            // Inputs
+            const inputUsername = document.getElementById('input-username');
+            const inputName = document.getElementById('input-name');
+            const inputEmail = document.getElementById('input-email');
+            const inputPhone = document.getElementById('input-phone');
+            const inputDept = document.getElementById('input-dept');
+            const inputSemester = document.getElementById('input-semester');
+            const inputCgpa = document.getElementById('input-cgpa');
+            const inputCompanyName = document.getElementById('input-company-name');
+            const inputLocation = document.getElementById('input-location');
+            const inputHr = document.getElementById('input-hr');
+            const inputWebsite = document.getElementById('input-website');
+
+            if (currentMode === 'signup') {
+                if (currentRole === 'STUDENT') {
+                    divUsername.classList.remove('hidden');
+                    divName.classList.remove('hidden');
+                    divEmail.classList.remove('hidden');
+                    divPhone.classList.remove('hidden');
+                    divDept.classList.remove('hidden');
+                    divAcademic.classList.remove('hidden');
+                    
+                    divFacultyPO.classList.add('hidden');
+                    divCompany.classList.add('hidden');
+
+                    inputUsername.required = true;
+                    inputName.required = true;
+                    inputEmail.required = true;
+                    inputPhone.required = true;
+                    inputSemester.required = true;
+                    inputCgpa.required = true;
+                    
+                    inputCompanyName.required = false;
+                    inputLocation.required = false;
+                    inputHr.required = false;
+                    inputWebsite.required = false;
+                } else if (currentRole === 'FACULTY') {
+                    divUsername.classList.remove('hidden');
+                    divName.classList.remove('hidden');
+                    divEmail.classList.remove('hidden');
+                    divDept.classList.remove('hidden');
+                    divFacultyPO.classList.remove('hidden');
+                    
+                    divPhone.classList.add('hidden');
+                    divAcademic.classList.add('hidden');
+                    divCompany.classList.add('hidden');
+
+                    inputUsername.required = true;
+                    inputName.required = true;
+                    inputEmail.required = true;
+                    
+                    inputPhone.required = false;
+                    inputSemester.required = false;
+                    inputCgpa.required = false;
+                    inputCompanyName.required = false;
+                    inputLocation.required = false;
+                    inputHr.required = false;
+                    inputWebsite.required = false;
+                } else if (currentRole === 'COMPANY') {
+                    divCompany.classList.remove('hidden');
+                    
+                    divUsername.classList.add('hidden');
+                    divName.classList.add('hidden');
+                    divEmail.classList.add('hidden');
+                    divPhone.classList.add('hidden');
+                    divDept.classList.add('hidden');
+                    divAcademic.classList.add('hidden');
+                    divFacultyPO.classList.add('hidden');
+
+                    inputUsername.required = false;
+                    inputName.required = false;
+                    inputEmail.required = false;
+                    inputPhone.required = false;
+                    inputSemester.required = false;
+                    inputCgpa.required = false;
+
+                    inputCompanyName.required = true;
+                    inputLocation.required = true;
+                    inputHr.required = true;
+                    inputWebsite.required = true;
+                }
+            }
+        }
+
+        // On reload check if model wants active signup
+        /*[[( ${signupActive} )]]*/
+        const shouldBeSignup = /*[[${signupActive}]]*/ false;
+        if (shouldBeSignup) {
+            setMode('signup');
         }
     </script>
 </body>

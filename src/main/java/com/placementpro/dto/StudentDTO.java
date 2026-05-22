@@ -9,6 +9,8 @@ public class StudentDTO {
     private int shortlistedCount;
     private int interviewsScheduled;
     private boolean isPlaced;
+    private String email;
+    private String phone;
 
     // Getters and Setters
     public String getUsn() { return usn; }
@@ -27,4 +29,8 @@ public class StudentDTO {
     public void setInterviewsScheduled(int interviewsScheduled) { this.interviewsScheduled = interviewsScheduled; }
     public boolean isPlaced() { return isPlaced; }
     public void setPlaced(boolean placed) { isPlaced = placed; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 }

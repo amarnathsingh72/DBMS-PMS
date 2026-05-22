@@ -4,19 +4,22 @@
     <meta charset="UTF-8">
     <title>Student Dashboard | PlacementPro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
     <script src="/js/main.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Outfit', sans-serif; }
+        .tab-btn.active {
+            border-color: #4f46e5;
+            color: #4f46e5;
+        }
     </style>
 </head>
 <body class="bg-[#F4F6FA] min-h-screen">
 
     <!-- Navigation -->
-    <nav class="bg-indigo-700 text-white shadow-lg">
+    <nav class="bg-indigo-700 text-white shadow-lg sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
             <div class="flex items-center space-x-3">
                 <span class="text-2xl">🎓</span>
@@ -24,12 +27,55 @@
                 <span class="px-2 py-0.5 text-xs font-bold bg-indigo-800/60 rounded ml-3 uppercase tracking-widest text-indigo-200">Student</span>
             </div>
             <div class="flex items-center space-x-5">
+                <!-- Notifications Bell icon -->
                 <div class="relative cursor-pointer" onclick="switchTab('notifications')">
                     <svg class="w-6 h-6 text-indigo-200 hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                    <span th:if="${unreadCount > 0}" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold" th:text="${unreadCount}">0</span>
+                    <span th:if="${unreadCount > 0}" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] w-4.5 h-4.5 flex items-center justify-center rounded-full font-bold border border-indigo-700" th:text="${unreadCount}">0</span>
                 </div>
-                <span class="text-indigo-100 text-sm font-medium" th:text="${student.name}">Name</span>
-                <span class="text-yellow-300 text-sm font-bold" th:text="'CGPA ' + ${student.cgpa}">CGPA</span>
+                
+                <!-- Clickable Student ID Container for Details Dropdown -->
+                <div class="relative">
+                    <button onclick="toggleProfileDropdown(event)" class="flex items-center space-x-2 bg-indigo-800/40 hover:bg-indigo-800/80 px-3 py-2 rounded-xl transition duration-200 border border-indigo-500/20 active:scale-95">
+                        <div class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center font-black text-xs text-white" th:text="${student.name.substring(0,1)}">S</div>
+                        <span class="text-indigo-100 text-xs font-bold uppercase tracking-wider" th:text="${student.usn}">USN</span>
+                        <svg class="w-3 h-3 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    
+                    <!-- Dynamic Details Dropdown Card -->
+                    <div id="profileDropdown" class="absolute right-0 mt-3 w-72 bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 p-5 hidden z-50 text-slate-800 transition-all duration-300">
+                        <div class="flex items-center gap-3 border-b border-slate-100 pb-4 mb-4">
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-xl font-bold text-indigo-600" th:text="${student.name.substring(0,1)}">S</div>
+                            <div class="overflow-hidden">
+                                <h4 class="font-black text-sm text-slate-800 truncate" th:text="${student.name}">Rahul Sharma</h4>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" th:text="${student.usn}">USN</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Department</span>
+                                <span class="font-extrabold text-slate-700" th:text="${student.dept}">CSE</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Academic CGPA</span>
+                                <span class="font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg" th:text="${student.cgpa}">8.50</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Email Address</span>
+                                <span class="font-semibold text-slate-600 truncate max-w-[150px]" th:text="${student.email != null ? student.email : 'N/A'}">rahul@example.com</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Phone Number</span>
+                                <span class="font-semibold text-slate-600" th:text="${student.phone != null ? student.phone : 'N/A'}">+91 9876543210</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs border-t border-slate-50 pt-2">
+                                <span class="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Status</span>
+                                <span th:if="${student.placed}" class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">PLACED 🎉</span>
+                                <span th:unless="${student.placed}" class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">ACTIVE SEEKING</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <a th:href="@{/logout}" class="bg-indigo-600 border border-indigo-500 hover:bg-indigo-500 px-3 py-1.5 rounded-lg text-sm font-medium transition">Sign Out</a>
             </div>
         </div>
@@ -53,12 +99,12 @@
                         <h3 class="font-bold tracking-wide">Smart Career Advisor</h3>
                     </div>
                     <div th:if="${aiAdvice}" class="animate-fade-in">
-                        <p class="text-sm leading-relaxed text-indigo-50 font-medium italic" th:text="${aiAdvice}">AI content goes here...</p>
+                        <p class="text-xs leading-relaxed text-indigo-50 font-medium italic" th:text="${aiAdvice}">AI content goes here...</p>
                     </div>
                     <div th:unless="${aiAdvice}" class="flex flex-col items-start gap-2">
-                        <p class="text-sm text-indigo-100/80">Get personalized career tips based on your profile.</p>
+                        <p class="text-xs text-indigo-100/80 font-medium">Get personalized career tips based on your profile.</p>
                         <button onclick="fetchAIAdvice()" id="ai-btn" class="mt-2 bg-white text-indigo-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-indigo-50 transition active:scale-95 flex items-center gap-2">
-                            <span>Get AI Advice</span>
+                            <span>Get Advice</span>
                             <div id="ai-loader" class="hidden w-3 h-3 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
                         </button>
                     </div>
@@ -70,79 +116,105 @@
 
         <!-- Main Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <!-- Left: Stats & Advisor -->
-            <div class="lg:col-span-2 space-y-8">
+            <!-- Left: Stats Cards -->
+            <div class="lg:col-span-2 flex flex-col justify-between">
                 <!-- Stat Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover">
-                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Applications</p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-5 h-full">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover flex flex-col justify-center">
+                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Applications</p>
                         <p class="text-4xl font-black text-[#1A56DB]" th:text="${student.applicationsSubmitted}">0</p>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover">
-                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Shortlisted</p>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover flex flex-col justify-center">
+                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Shortlisted</p>
                         <p class="text-4xl font-black text-[#F59E0B]" th:text="${student.shortlistedCount}">0</p>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover">
-                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Interviews</p>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card-hover flex flex-col justify-center">
+                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Interviews</p>
                         <p class="text-4xl font-black text-[#8B5CF6]" th:text="${student.interviewsScheduled}">0</p>
                     </div>
-                    <div class="p-6 rounded-2xl shadow-sm border card-hover"
+                    <div class="p-6 rounded-2xl shadow-sm border card-hover flex flex-col justify-center"
                          th:classappend="${student.placed ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-100'}">
-                        <p class="text-xs font-bold uppercase tracking-widest mb-1" th:classappend="${student.placed ? 'text-emerald-600' : 'text-slate-400'}">Status</p>
-                        <p th:if="${student.placed}" class="text-2xl font-black text-emerald-600">PLACED 🎉</p>
-                        <p th:unless="${student.placed}" class="text-xl font-bold text-slate-400">Seeking</p>
+                        <p class="text-[10px] font-black uppercase tracking-widest mb-1" th:classappend="${student.placed ? 'text-emerald-600' : 'text-slate-400'}">Status</p>
+                        <p th:if="${student.placed}" class="text-xl font-black text-emerald-600">PLACED 🎉</p>
+                        <p th:unless="${student.placed}" class="text-lg font-bold text-slate-400">Seeking</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Dynamic Placement Pipeline Chart / Avatar Guide Checklist -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Placement Pipeline</h3>
+                
+                <!-- Fallback: Empty Pipeline Interactive Guide Checklist -->
+                <div th:if="${student.applicationsSubmitted == 0}" class="flex flex-col items-center text-center p-4">
+                    <div class="w-16 h-16 rounded-3xl bg-indigo-50 border-2 border-indigo-100 flex items-center justify-center text-2xl mb-4 font-black text-indigo-600" th:text="${student.name.substring(0,1)}">S</div>
+                    <h4 class="text-sm font-bold text-slate-800" th:text="${student.name}">Student Name</h4>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5" th:text="${student.usn}">USN</p>
+                    
+                    <div class="w-full mt-6 space-y-2 text-left">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Next Pipeline Steps</p>
+                        
+                        <div class="flex items-center gap-3 bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-100">
+                            <span class="text-emerald-500 font-bold text-xs">✓</span>
+                            <span class="text-[11px] text-emerald-800 font-bold">Profile Verified (CGPA: <span th:text="${student.cgpa}">8.5</span>)</span>
+                        </div>
+                        <button onclick="switchTab('jobs')" class="w-full flex items-center gap-3 bg-indigo-50/30 hover:bg-indigo-50/70 p-2.5 rounded-xl border border-indigo-100 text-left transition active:scale-95">
+                            <span class="text-indigo-400 font-bold text-xs">⬜</span>
+                            <span class="text-[11px] text-indigo-700 font-bold">Browse & Apply to first job →</span>
+                        </button>
+                        <button onclick="fetchAIAdvice()" class="w-full flex items-center gap-3 bg-violet-50/30 hover:bg-violet-50/70 p-2.5 rounded-xl border border-violet-100 text-left transition active:scale-95">
+                            <span class="text-violet-400 font-bold text-xs">⬜</span>
+                            <span class="text-[11px] text-violet-700 font-bold">Request Smart AI Career Advice →</span>
+                        </button>
                     </div>
                 </div>
 
-                <!-- AI Advisor (already there, but wrapping it) -->
-                <div th:replace="~{student-dashboard :: ai-section}"></div>
-            </div>
-
-            <!-- Right: Analytics Chart -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-6">Placement Pipeline</h3>
-                <canvas id="pipelineChart" height="200"></canvas>
+                <!-- Chart is shown normally if applications exist -->
+                <div th:unless="${student.applicationsSubmitted == 0}" class="relative w-full h-[200px] flex items-center justify-center">
+                    <canvas id="pipelineChart"></canvas>
+                </div>
             </div>
         </div>
 
         <!-- Tabs -->
         <div class="flex space-x-1 border-b border-slate-200 mb-6">
-            <button onclick="switchTab('jobs')" id="tab-jobs" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-indigo-600 transition active">Browse Jobs</button>
-            <button onclick="switchTab('applications')" id="tab-applications" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-indigo-600 transition">My Applications</button>
-            <button onclick="switchTab('notifications')" id="tab-notifications" class="tab-btn px-5 py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-indigo-600 transition">
-                Notifications <span th:if="${unreadCount > 0}" class="ml-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full" th:text="${unreadCount}">0</span>
+            <button onclick="switchTab('jobs')" id="tab-jobs" class="tab-btn px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 border-transparent text-slate-500 hover:text-indigo-600 transition active">Browse Jobs</button>
+            <button onclick="switchTab('applications')" id="tab-applications" class="tab-btn px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 border-transparent text-slate-500 hover:text-indigo-600 transition">My Applications</button>
+            <button onclick="switchTab('notifications')" id="tab-notifications" class="tab-btn px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 border-transparent text-slate-500 hover:text-indigo-600 transition relative">
+                Notifications
+                <span th:if="${unreadCount > 0}" class="ml-1 bg-red-500 text-white text-[9px] w-4.5 h-4.5 flex items-center justify-center rounded-full inline-flex font-bold" th:text="${unreadCount}">0</span>
             </button>
         </div>
 
         <!-- TAB: Browse Jobs -->
         <div id="panel-jobs" class="tab-panel">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-slate-50">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <table class="min-w-full divide-y divide-slate-100">
+                    <thead class="bg-slate-50/50">
                         <tr>
-                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Company</th>
-                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Role</th>
-                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Package</th>
-                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Deadline</th>
-                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Eligibility</th>
-                            <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase">Action</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Company</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Role</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Package</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Deadline</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Eligibility</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <tr th:each="job : ${jobs}" th:classappend="${!job.eligible and !job.hasApplied} ? 'opacity-60' : ''">
-                            <td class="px-5 py-4 text-sm font-medium text-slate-800" th:text="${job.companyName}">Company</td>
-                            <td class="px-5 py-4 text-sm text-slate-600" th:text="${job.roleName}">Role</td>
-                            <td class="px-5 py-4 text-sm font-semibold text-emerald-600" th:text="${job.packageLpa} + ' LPA'">LPA</td>
-                            <td class="px-5 py-4 text-sm text-slate-500" th:text="${job.deadline}">Date</td>
-                            <td class="px-5 py-4">
-                                <span th:if="${job.eligible}" class="px-2.5 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-700">✓ Eligible</span>
-                                <span th:if="${job.hasApplied}" class="px-2.5 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-700">✓ Applied</span>
-                                <span th:if="${!job.eligible and !job.hasApplied}" class="px-2.5 py-1 text-xs font-bold rounded-full bg-red-50 text-red-500" th:text="${job.eligibilityMessage}">Reason</span>
+                    <tbody class="divide-y divide-slate-50">
+                        <tr th:each="job : ${jobs}" th:classappend="${!job.eligible and !job.hasApplied} ? 'opacity-60' : ''" class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4 text-sm font-bold text-slate-800" th:text="${job.companyName}">Company</td>
+                            <td class="px-6 py-4 text-sm text-slate-600" th:text="${job.roleName}">Role</td>
+                            <td class="px-6 py-4 text-sm font-black text-emerald-600" th:text="${job.packageLpa} + ' LPA'">LPA</td>
+                            <td class="px-6 py-4 text-xs font-bold text-slate-400 uppercase" th:text="${#dates.format(job.deadline, 'dd MMM yyyy')}">Date</td>
+                            <td class="px-6 py-4">
+                                <span th:if="${job.eligible}" class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-700">✓ Eligible</span>
+                                <span th:if="${job.hasApplied}" class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-blue-100 text-blue-700">✓ Applied</span>
+                                <span th:if="${!job.eligible and !job.hasApplied}" class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-red-50 text-red-500" th:text="${job.eligibilityMessage}">Reason</span>
                             </td>
-                            <td class="px-5 py-4">
+                            <td class="px-6 py-4">
                                 <form th:if="${job.eligible}" th:action="@{/student/apply}" method="post" class="inline">
                                     <input type="hidden" name="jobId" th:value="${job.jobId}">
-                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition active:scale-95 shadow-sm">Apply</button>
+                                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold px-4 py-2 rounded-lg transition active:scale-95 shadow-sm uppercase tracking-wider">Apply</button>
                                 </form>
                                 <span th:unless="${job.eligible}" class="text-slate-300 text-xs">—</span>
                             </td>
@@ -155,33 +227,38 @@
         <!-- TAB: My Applications -->
         <div id="panel-applications" class="tab-panel hidden">
             <div class="space-y-4">
-                <div th:each="app : ${applications}" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                <div th:each="app : ${applications}" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 card-hover">
                     <div class="flex justify-between items-start">
                         <div>
-                            <h3 class="font-bold text-slate-800" th:text="${app.roleName}">Role</h3>
+                            <h3 class="font-extrabold text-slate-800 text-base" th:text="${app.roleName}">Role</h3>
                             <p class="text-sm text-slate-500" th:text="${app.companyName} + ' • ' + ${app.packageLpa} + ' LPA'">Company</p>
-                            <p class="text-xs text-slate-400 mt-1">Applied: <span th:text="${app.applyDate}">Date</span></p>
+                            <p class="text-xs text-slate-400 font-medium mt-1">Applied: <span th:text="${#dates.format(app.applyDate, 'dd MMM yyyy')}">Date</span></p>
                         </div>
-                        <span class="px-3 py-1 text-xs font-bold rounded-full"
-                              th:classappend="${app.status == 'Applied' ? 'status-applied' : (app.status == 'Shortlisted' ? 'status-shortlisted' : (app.status == 'Interview Scheduled' ? 'status-interview' : (app.status == 'Selected' ? 'status-selected' : 'status-rejected')))}"
+                        <span class="px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider"
+                              th:classappend="${app.status == 'Applied' ? 'bg-blue-50 text-blue-600' : (app.status == 'Shortlisted' ? 'bg-amber-50 text-amber-600' : (app.status == 'Interview Scheduled' ? 'bg-violet-50 text-violet-600' : (app.status == 'Selected' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-50 text-rose-600')))}"
                               th:text="${app.status}">Status</span>
                     </div>
                     <!-- Interview Rounds -->
-                    <div th:if="${app.interviews != null and !app.interviews.isEmpty()}" class="mt-4 border-t border-slate-100 pt-3">
-                        <p class="text-xs font-bold text-slate-400 uppercase mb-2">Interview Rounds</p>
-                        <div class="space-y-2">
-                            <div th:each="iv : ${app.interviews}" class="flex items-center justify-between bg-slate-50 rounded-lg px-4 py-2">
-                                <span class="text-sm font-medium text-slate-700" th:text="${iv.roundName}">Round</span>
-                                <span class="text-sm text-slate-500" th:text="${iv.interviewDate} + ' ' + ${iv.interviewTime}">Date</span>
-                                <span class="text-xs font-bold rounded-full px-2 py-0.5"
-                                      th:classappend="${iv.result == 'Pass' ? 'bg-emerald-100 text-emerald-700' : (iv.result == 'Fail' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-700')}"
-                                      th:text="${iv.result}">Result</span>
+                    <div th:if="${app.interviews != null and !app.interviews.isEmpty()}" class="mt-4 border-t border-slate-100 pt-4">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Scheduled Interview Rounds</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div th:each="iv : ${app.interviews}" class="bg-slate-50/50 rounded-xl border border-slate-100 p-3.5 flex flex-col justify-between">
+                                <div class="flex justify-between items-start">
+                                    <span class="text-xs font-bold text-slate-800" th:text="${iv.roundName}">Round</span>
+                                    <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                                          th:classappend="${iv.result == 'Pass' ? 'bg-emerald-100 text-emerald-700' : (iv.result == 'Fail' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-700')}"
+                                          th:text="${iv.result}">Result</span>
+                                </div>
+                                <div class="mt-3 flex items-center justify-between text-xs text-slate-500">
+                                    <span th:text="'📅 ' + ${#dates.format(iv.interviewDate, 'dd MMM yyyy')} + ' • ' + ${iv.interviewTime}">Schedule</span>
+                                    <span class="text-[10px] italic font-medium truncate max-w-[120px]" th:text="'📍 ' + ${iv.venue}">Venue</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div th:if="${applications.isEmpty()}" class="text-center py-12 text-slate-400">
-                    <p class="text-lg">No applications yet. Browse jobs and apply!</p>
+                    <p class="text-sm font-semibold">No applications yet. Browse jobs and apply!</p>
                 </div>
             </div>
         </div>
@@ -189,71 +266,99 @@
         <!-- TAB: Notifications -->
         <div id="panel-notifications" class="tab-panel hidden">
             <div class="space-y-3">
-                <div th:each="notif : ${notifications}" class="bg-white rounded-xl shadow-sm border p-4 flex items-start space-x-3"
-                     th:classappend="${!notif.read ? 'border-indigo-200 bg-indigo-50/30' : 'border-slate-200'}">
-                    <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                         th:classappend="${!notif.read ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400'}">🔔</div>
-                    <div class="flex-1">
-                        <p class="text-sm text-slate-700" th:text="${notif.message}">Message</p>
-                        <p class="text-xs text-slate-400 mt-1" th:text="${notif.createdAt}">Time</p>
+                <div th:each="notif : ${notifications}" class="bg-white rounded-2xl shadow-sm border p-5 flex items-start justify-between"
+                     th:classappend="${!notif.read ? 'border-indigo-200 bg-indigo-50/20 shadow-lg shadow-indigo-100/50' : 'border-slate-100'}">
+                    <div class="flex gap-4 items-start">
+                        <div class="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-sm"
+                             th:classappend="${!notif.read ? 'bg-indigo-100 text-indigo-600 font-bold' : 'bg-slate-100 text-slate-400'}">🔔</div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-700 leading-relaxed" th:text="${notif.message}">Message</p>
+                            <p class="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-widest" th:text="${notif.createdAt}">Time</p>
+                        </div>
                     </div>
                     <form th:if="${!notif.read}" th:action="@{/student/notifications/read}" method="post">
                         <input type="hidden" name="notifId" th:value="${notif.notifId}">
-                        <button class="text-xs text-indigo-500 hover:text-indigo-700 font-medium">Mark read</button>
+                        <button class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 hover:text-indigo-700 font-black px-3 py-1.5 rounded-lg text-[10px] transition uppercase tracking-wider">Mark Read</button>
                     </form>
                 </div>
                 <div th:if="${notifications.isEmpty()}" class="text-center py-12 text-slate-400">
-                    <p class="text-lg">No notifications yet.</p>
+                    <p class="text-sm font-semibold">No notifications yet.</p>
                 </div>
             </div>
         </div>
     </main>
 
-    <script>
+    <script th:inline="javascript">
         function switchTab(tab) {
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('panel-' + tab).classList.remove('hidden');
-            document.getElementById('tab-' + tab).classList.add('active');
+            
+            const panel = document.getElementById('panel-' + tab);
+            if (panel) panel.classList.remove('hidden');
+            
+            const tabBtn = document.getElementById('tab-' + tab);
+            if (tabBtn) tabBtn.classList.add('active');
         }
-        // Check URL for tab param
+
+        // Toggle Details Dropdown
+        function toggleProfileDropdown(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // Check URL for active tab param on reload
         const urlParams = new URLSearchParams(window.location.search);
         const tab = urlParams.get('tab');
         if (tab) switchTab(tab);
 
-        // Chart Initialization
-        const ctx = document.getElementById('pipelineChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Applied', 'Shortlisted', 'Interview', 'Selected'],
-                datasets: [{
-                    data: [
-                        /*[[${student.applicationsSubmitted}]]*/ 0, 
-                        /*[[${student.shortlistedCount}]]*/ 0, 
-                        /*[[${student.interviewsScheduled}]]*/ 0, 
-                        /*[[${student.placed ? 1 : 0}]]*/ 0
-                    ],
-                    backgroundColor: ['#3B82F6', '#F59E0B', '#8B5CF6', '#10B981'],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+        // Chart Initialization (only if student has submitted applications)
+        const appsSubmitted = /*[[${student.applicationsSubmitted}]]*/ 0;
+        if (appsSubmitted > 0) {
+            const ctx = document.getElementById('pipelineChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Applied', 'Shortlisted', 'Interview Scheduled', 'Placed'],
+                    datasets: [{
+                        data: [
+                            /*[[${student.applicationsSubmitted}]]*/ 0, 
+                            /*[[${student.shortlistedCount}]]*/ 0, 
+                            /*[[${student.interviewsScheduled}]]*/ 0, 
+                            /*[[${student.placed ? 1 : 0}]]*/ 0
+                        ],
+                        backgroundColor: ['#6366F1', '#F59E0B', '#8B5CF6', '#10B981'],
+                        borderWidth: 1,
+                        borderColor: '#ffffff',
+                        hoverOffset: 4
+                    }]
                 },
-                cutout: '70%'
-            }
-        });
+                options: {
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    cutout: '72%',
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
 
         async function fetchAIAdvice() {
             const btn = document.getElementById('ai-btn');
             const loader = document.getElementById('ai-loader');
             const section = document.getElementById('ai-section');
             
-            btn.disabled = true;
-            loader.classList.remove('hidden');
+            if (btn) btn.disabled = true;
+            if (loader) loader.classList.remove('hidden');
             
             try {
                 const response = await fetch('/student/ai-advice');

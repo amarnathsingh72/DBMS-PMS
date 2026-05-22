@@ -2,7 +2,6 @@ package com.placementpro.controller;
 
 import com.placementpro.dto.ApplicationDTO;
 import com.placementpro.dto.JobPostingDTO;
-import com.placementpro.dto.NotificationDTO;
 import com.placementpro.service.CompanyService;
 import com.placementpro.service.NotificationService;
 import jakarta.servlet.http.HttpSession;
@@ -38,10 +37,26 @@ public class CompanyController {
         List<JobPostingDTO> jobs = companyService.getJobsByCompany(companyId);
         Map<String, Object> stats = companyService.getCompanyStats(companyId);
 
+        // Fetch lists for the new sections representing actions taken
+        List<ApplicationDTO> shortlisted = companyService.getApplicantsByStatus(companyId, "Shortlisted");
+        List<ApplicationDTO> selected = companyService.getApplicantsByStatus(companyId, "Selected");
+        List<ApplicationDTO> interviewScheduled = companyService.getApplicantsByStatus(companyId, "Interview Scheduled");
+        List<ApplicationDTO> rejected = companyService.getApplicantsByStatus(companyId, "Rejected");
+
+        // Fetch status counts for the alignment-fixed polar chart
+        Map<String, Integer> statusCounts = companyService.getStatusCounts(companyId);
+
         model.addAttribute("companyName", companyName);
         model.addAttribute("companyId", companyId);
         model.addAttribute("jobs", jobs);
         model.addAttribute("stats", stats);
+        model.addAttribute("statusCounts", statusCounts);
+
+        // Add lists to model
+        model.addAttribute("shortlisted", shortlisted);
+        model.addAttribute("selected", selected);
+        model.addAttribute("interviewScheduled", interviewScheduled);
+        model.addAttribute("rejected", rejected);
 
         return "company-dashboard";
     }
@@ -64,11 +79,26 @@ public class CompanyController {
     }
 
     @PostMapping("/update-status")
-    public String updateStatus(@RequestParam int appId, @RequestParam String status, @RequestParam int jobId, HttpSession session) {
+    public String updateStatus(@RequestParam int appId, 
+                               @RequestParam String status, 
+                               @RequestParam(required = false, defaultValue = "-1") int jobId, 
+                               HttpSession session) {
         String role = (String) session.getAttribute("role");
         if (role == null || !"COMPANY".equals(role)) return "redirect:/login";
+        
         companyService.updateApplicationStatus(appId, status);
-        return "redirect:/company/applicants?jobId=" + jobId;
+        
+        if (jobId != -1) {
+            return "redirect:/company/applicants?jobId=" + jobId;
+        } else {
+            // Redirect to dashboard with active tab depending on the updated state
+            String tab = "jobs";
+            if ("Shortlisted".equals(status)) tab = "shortlisted";
+            else if ("Selected".equals(status)) tab = "selected";
+            else if ("Interview Scheduled".equals(status)) tab = "interviews";
+            else if ("Rejected".equals(status)) tab = "rejected";
+            return "redirect:/company/dashboard?tab=" + tab;
+        }
     }
 
     @PostMapping("/post-job")
@@ -85,23 +115,32 @@ public class CompanyController {
     @PostMapping("/schedule-interview")
     public String scheduleInterview(@RequestParam int appId, @RequestParam String roundName,
                                     @RequestParam String interviewDate, @RequestParam String interviewTime,
-                                    @RequestParam(required = false) String venue, @RequestParam int jobId,
+                                    @RequestParam(required = false) String venue, @RequestParam(required = false, defaultValue = "-1") int jobId,
                                     HttpSession session) {
         String role = (String) session.getAttribute("role");
         if (role == null || !"COMPANY".equals(role)) return "redirect:/login";
         int companyId = Integer.parseInt((String) session.getAttribute("userId"));
         companyService.scheduleInterview(appId, roundName, interviewDate, interviewTime, venue, companyId);
-        return "redirect:/company/applicants?jobId=" + jobId;
+        
+        if (jobId != -1) {
+            return "redirect:/company/applicants?jobId=" + jobId;
+        } else {
+            return "redirect:/company/dashboard?tab=interviews";
+        }
     }
 
     @PostMapping("/reschedule-interview")
     public String rescheduleInterview(@RequestParam int interviewId, @RequestParam String newDate,
-                                      @RequestParam String newTime, @RequestParam int jobId,
+                                      @RequestParam String newTime, @RequestParam(required = false, defaultValue = "-1") int jobId,
                                       HttpSession session) {
         String role = (String) session.getAttribute("role");
         if (role == null || !"COMPANY".equals(role)) return "redirect:/login";
-        // This fires trg_interview_reschedule TRIGGER automatically
         companyService.rescheduleInterview(interviewId, newDate, newTime);
-        return "redirect:/company/applicants?jobId=" + jobId;
+        
+        if (jobId != -1) {
+            return "redirect:/company/applicants?jobId=" + jobId;
+        } else {
+            return "redirect:/company/dashboard?tab=interviews";
+        }
     }
 }

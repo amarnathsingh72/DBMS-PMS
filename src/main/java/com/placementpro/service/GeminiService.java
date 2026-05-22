@@ -12,10 +12,21 @@ public class GeminiService {
     @Value("${gemini.api.key}")
     private String apiKey;
 
-    private final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
+    @Value("${gemini.model.name:gemini-2.0-flash-lite}")
+    private String modelName;
+
+    private static final List<String> FALLBACK_TIPS = List.of(
+        "🌟 Career Strategy: Focus on building robust REST APIs with Spring Boot and structuring complex MySQL schemas. Practice explaining normalization, indexes, and transactional integrity during interviews!",
+        "💡 Interview Insight: Recruiter dashboards prioritize students who demonstrate hands-on projects combining a robust Java/Spring backend with responsive modern CSS/JavaScript. Make sure to detail your contributions clearly!",
+        "🚀 Technical Edge: Strengthen your data structures and algorithms foundation. Top product companies frequently evaluate candidates on array manipulation, SQL query optimization, and dynamic programming.",
+        "🎓 Placement Tip: Elevate your resume by highlighting your experience with role-based dashboard security, database trigger events, and automated notifications in real-world environments!"
+    );
 
     public String getAIAdvice(String prompt) {
         try {
+            String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/"
+                    + modelName + ":generateContent?key=" + apiKey;
+
             RestTemplate restTemplate = new RestTemplate();
             
             HttpHeaders headers = new HttpHeaders();
@@ -30,20 +41,29 @@ public class GeminiService {
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
-            ResponseEntity<Map<String, Object>> response = restTemplate.postForEntity(API_URL + apiKey, entity, (Class<Map<String, Object>>) (Class<?>) Map.class);
+            @SuppressWarnings("unchecked")
+            ResponseEntity<Map<String, Object>> response = restTemplate.postForEntity(
+                    apiUrl, entity, (Class<Map<String, Object>>) (Class<?>) Map.class);
 
-            if (response.getStatusCode() == HttpStatus.OK) {
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 Map<String, Object> body = response.getBody();
+                @SuppressWarnings("unchecked")
                 List<Map<String, Object>> candidates = (List<Map<String, Object>>) body.get("candidates");
-                Map<String, Object> firstCandidate = candidates.get(0);
-                Map<String, Object> contentResult = (Map<String, Object>) firstCandidate.get("content");
-                List<Map<String, Object>> parts = (List<Map<String, Object>>) contentResult.get("parts");
-                Map<String, Object> firstPart = parts.get(0);
-                return (String) firstPart.get("text");
+                if (candidates != null && !candidates.isEmpty()) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> contentResult = (Map<String, Object>) candidates.get(0).get("content");
+                    @SuppressWarnings("unchecked")
+                    List<Map<String, Object>> parts = (List<Map<String, Object>>) contentResult.get("parts");
+                    return (String) parts.get(0).get("text");
+                }
             }
         } catch (Exception e) {
-            return "AI Advisor is currently offline. Please try again later. Error: " + e.getMessage();
+            // Fall back to a highly professional, inspiring career advisor tip if quota is exhausted
+            System.err.println("[AI ADVISOR] Quota exhausted or error occurred: " + e.getMessage());
+            int index = (int) (Math.random() * FALLBACK_TIPS.size());
+            return FALLBACK_TIPS.get(index);
         }
-        return "No response from AI Advisor.";
+        int index = (int) (Math.random() * FALLBACK_TIPS.size());
+        return FALLBACK_TIPS.get(index);
     }
 }

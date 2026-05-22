@@ -13,6 +13,12 @@ public class FacultyService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private EmailService emailService;
+
     public String getFacultyName(String facultyId) {
         return jdbcTemplate.queryForObject("SELECT Name FROM FACULTY WHERE Faculty_ID = ?", String.class, facultyId);
     }
@@ -50,10 +56,57 @@ public class FacultyService {
     // --- At-Risk Students (Q1 from spec) ---
     public List<Map<String, Object>> getAtRiskStudents() {
         return jdbcTemplate.queryForList(
-            "SELECT s.Student_USN, s.Name, s.CGPA, s.Dept FROM STUDENT s " +
+            "SELECT s.Student_USN, s.Name, s.CGPA, s.Dept, s.Email FROM STUDENT s " +
             "LEFT JOIN APPLICATIONS a ON s.Student_USN = a.Student_USN " +
             "WHERE a.App_ID IS NULL AND s.Is_Placed = FALSE"
         );
+    }
+
+    /**
+     * Sends urgent placement alerts to both at-risk students and faculty members.
+     */
+    public int sendRiskAlerts(String triggeredByFacultyId) {
+        List<Map<String, Object>> atRisk = getAtRiskStudents();
+        if (atRisk.isEmpty()) return 0;
+
+        String facultyName = getFacultyName(triggeredByFacultyId);
+
+        // 1) Send in-app & email notification to each student
+        for (Map<String, Object> s : atRisk) {
+            String usn = (String) s.get("Student_USN");
+            String name = (String) s.get("Name");
+            String email = (String) s.get("Email");
+
+            String studentMsg = "URGENT ALERT: You have zero active job applications. " +
+                                "Please browse eligible roles and submit applications immediately to ensure placement readiness.";
+            notificationService.createNotification(usn, "STUDENT", studentMsg, "RISK_ALERT");
+
+            if (email != null && !email.isEmpty()) {
+                emailService.sendNotificationEmail(email, name, "Urgent Placement Action Required", studentMsg);
+            }
+        }
+
+        // 2) Notify all Placement Officers/Faculty members
+        List<Map<String, Object>> officers = jdbcTemplate.queryForList(
+            "SELECT Faculty_ID, Name, Email FROM FACULTY");
+        
+        String facultyMsg = "INTERVENTION ALERT: Placement Officer " + facultyName + 
+                            " has dispatched automated intervention warnings to " + atRisk.size() + 
+                            " unplaced students with zero active applications.";
+
+        for (Map<String, Object> officer : officers) {
+            String facId = (String) officer.get("Faculty_ID");
+            String facEmail = (String) officer.get("Email");
+            String facName = (String) officer.get("Name");
+
+            notificationService.createNotification(facId, "FACULTY", facultyMsg, "RISK_ALERT");
+
+            if (facEmail != null && !facEmail.isEmpty()) {
+                emailService.sendNotificationEmail(facEmail, facName, "Student Risk Intervention Dispatched", facultyMsg);
+            }
+        }
+
+        return atRisk.size();
     }
 
     // --- All Students ---

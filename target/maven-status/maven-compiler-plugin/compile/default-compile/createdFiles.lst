@@ -1,9 +1,11 @@
 com\placementpro\dto\NotificationDTO.class
+com\placementpro\service\GeminiService.class
 com\placementpro\dto\JobPostingDTO.class
 com\placementpro\dto\StudentDTO.class
 com\placementpro\controller\CompanyController.class
 com\placementpro\dto\InterviewDTO.class
 com\placementpro\controller\StudentController.class
+com\placementpro\service\EmailService.class
 com\placementpro\controller\LoginController.class
 com\placementpro\dto\ApplicationDTO.class
 com\placementpro\service\FacultyService.class
