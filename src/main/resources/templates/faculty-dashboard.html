@@ -108,7 +108,7 @@
                             <tr th:each="s : ${students}" class="hover:bg-slate-50 transition-colors">
                                 <td class="px-6 py-4 text-sm font-bold text-slate-600" th:text="${s['Student_USN']}">USN</td>
                                 <td class="px-6 py-4 text-sm">
-                                    <button th:onclick="showStudentDetails([[${s['Student_USN']}]])" class="text-indigo-600 hover:text-indigo-800 hover:underline transition font-bold text-left active:scale-[0.99]" th:text="${s['Name']}">Name</button>
+                                    <button th:data-usn="${s['Student_USN']}" onclick="showStudentDetails(this.getAttribute('data-usn'))" class="text-indigo-600 hover:text-indigo-800 hover:underline transition font-bold text-left active:scale-[0.99]" th:text="${s['Name']}">Name</button>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-slate-500" th:text="${s['Dept']}">Dept</td>
                                 <td class="px-6 py-4 text-sm font-bold text-indigo-600" th:text="${s['CGPA']}">CGPA</td>
@@ -161,7 +161,7 @@
                             <tr th:each="p : ${pipeline}" class="hover:bg-slate-50 transition-colors">
                                 <td class="px-6 py-4">
                                     <!-- Interactive Student name clickable link -->
-                                    <button th:onclick="showStudentDetails([[${p['USN']}]])" class="text-indigo-600 hover:text-indigo-800 hover:underline transition text-sm font-bold text-left block active:scale-[0.99]" th:text="${p['Student_Name']}">Name</button>
+                                    <button th:data-usn="${p['USN']}" onclick="showStudentDetails(this.getAttribute('data-usn'))" class="text-indigo-600 hover:text-indigo-800 hover:underline transition text-sm font-bold text-left block active:scale-[0.99]" th:text="${p['Student_Name']}">Name</button>
                                     <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5" th:text="${p['USN']}">USN</p>
                                 </td>
                                 <td class="px-6 py-4 text-sm font-semibold text-slate-600" th:text="${p['Company_Name']}">Company</td>
@@ -204,7 +204,7 @@
                             <tr th:each="r : ${atRisk}" class="hover:bg-red-50/30 transition-colors">
                                 <td class="px-6 py-4 text-sm font-bold text-slate-700 font-mono" th:text="${r['Student_USN']}">USN</td>
                                 <td class="px-6 py-4 text-sm">
-                                    <button th:onclick="showStudentDetails([[${r['Student_USN']}]])" class="text-indigo-600 hover:text-indigo-800 hover:underline transition font-bold text-left active:scale-[0.99]" th:text="${r['Name']}">Name</button>
+                                    <button th:data-usn="${r['Student_USN']}" onclick="showStudentDetails(this.getAttribute('data-usn'))" class="text-indigo-600 hover:text-indigo-800 hover:underline transition font-bold text-left active:scale-[0.99]" th:text="${r['Name']}">Name</button>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-slate-500" th:text="${r['Dept']}">Dept</td>
                                 <td class="px-6 py-4 text-sm font-bold text-red-600" th:text="${r['CGPA']}">CGPA</td>
@@ -270,16 +270,19 @@
 
     <script th:inline="javascript">
         // Student Details JS Lookup Map
+        const studentsList = /*[[${students}]]*/ [];
         const studentMap = {};
-        /*[# th:each="s : ${students}"]*/
-        studentMap[[[${s['Student_USN']}]]] = {
-            name: [[${s['Name']}]],
-            dept: [[${s['Dept']}]],
-            cgpa: [[${s['CGPA']}]],
-            email: [[${s['Email']}]],
-            placed: [[${s['Is_Placed']}]]
-        };
-        /*[/]*/
+        if (studentsList && studentsList.length > 0) {
+            studentsList.forEach(s => {
+                studentMap[s.Student_USN] = {
+                    name: s.Name,
+                    dept: s.Dept,
+                    cgpa: s.CGPA,
+                    email: s.Email,
+                    placed: s.Is_Placed
+                };
+            });
+        }
 
         function showStudentDetails(usn) {
             const s = studentMap[usn];
